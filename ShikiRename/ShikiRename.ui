@@ -1,0 +1,636 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ShikiRenameClass</class>
+ <widget class="QMainWindow" name="ShikiRenameClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1533</width>
+    <height>887</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ShikiRename</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="toolTipDuration">
+    <number>-1</number>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="1" column="1">
+     <widget class="QPushButton" name="confirmButton">
+      <property name="text">
+       <string>Rename</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" colspan="2">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="100,0,70">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QListWidget" name="currentList">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="renamePreview"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkboxOnlySelected">
+        <property name="text">
+         <string>Rename only selected entries</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="tab_1">
+         <attribute name="title">
+          <string>Edit</string>
+         </attribute>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>10</y>
+            <width>1241</width>
+            <height>144</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="tab_1_gridLayout">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetNoConstraint</enum>
+           </property>
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item row="2" column="8">
+            <widget class="QLineEdit" name="editRemoveAt2"/>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="labelRemoveLeft2">
+             <property name="text">
+              <string>characters</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="7">
+            <widget class="QLabel" name="labelRemoveRight2">
+             <property name="text">
+              <string>characters</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labelInsert1">
+             <property name="text">
+              <string>Insert at index</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="5">
+            <widget class="QLabel" name="labelRemoveAt1">
+             <property name="text">
+              <string>Remove</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLabel" name="labelReplace2">
+             <property name="text">
+              <string>with</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="editInsert1"/>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="editRemoveLeft">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="labelPrefix">
+             <property name="text">
+              <string>Prefix filename</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="5">
+            <widget class="QLabel" name="labelSuffix">
+             <property name="text">
+              <string>Suffix filename</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="6">
+            <widget class="QLineEdit" name="editSuffix"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="labelNumIdx">
+             <property name="text">
+              <string>Number at index</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="editNumIdx"/>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="editPrefix"/>
+           </item>
+           <item row="2" column="7">
+            <widget class="QLabel" name="labelRemoveAt2">
+             <property name="text">
+              <string>characters past index</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QLineEdit" name="editReplace2"/>
+           </item>
+           <item row="0" column="6">
+            <widget class="QLineEdit" name="editRemoveRight">
+             <property name="placeholderText">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelRemoveLeft1">
+             <property name="text">
+              <string>Remove the first</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelReplace1">
+             <property name="text">
+              <string>Replace</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <widget class="QLabel" name="labelRemoveRight1">
+             <property name="text">
+              <string>Remove last</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="6">
+            <widget class="QLineEdit" name="editRemoveAt1">
+             <property name="placeholderText">
+              <string>0</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="editReplace1"/>
+           </item>
+           <item row="2" column="2">
+            <widget class="QLabel" name="labelInsert2">
+             <property name="text">
+              <string>the text</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3">
+            <widget class="QLineEdit" name="editInsert2"/>
+           </item>
+           <item row="4" column="9">
+            <widget class="QLabel" name="labelNumDigits2">
+             <property name="text">
+              <string>digits</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="6">
+            <widget class="QLineEdit" name="editNumInc">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>1</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="7">
+            <widget class="QLabel" name="labelNumDigits">
+             <property name="text">
+              <string>using</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="5">
+            <widget class="QLabel" name="labelNumInc">
+             <property name="text">
+              <string>incrementing by</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="3">
+            <widget class="QLineEdit" name="editNumInitV">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>1</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QLabel" name="labelNumInitV">
+             <property name="text">
+              <string>starting with</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="8">
+            <widget class="QLineEdit" name="editNumDigits">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>1</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4" rowspan="5">
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>Movies / Episodes</string>
+         </attribute>
+         <widget class="QWidget" name="gridLayoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1071</width>
+            <height>260</height>
+           </rect>
+          </property>
+          <layout class="QGridLayout" name="tab_2_gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0" columnstretch="0,25,0,25,0">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetNoConstraint</enum>
+           </property>
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item row="2" column="1">
+            <widget class="QLineEdit" name="editSeriesNrPrefix">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>s</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="2">
+            <widget class="QLabel" name="labelResolution">
+             <property name="text">
+              <string>Video Resolution</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="editEpisodeNrPrefix">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>e</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QComboBox" name="comboEpisodeNameSrc">
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>TheTVDB.com</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QLabel" name="labelEpisodeNameLang">
+             <property name="text">
+              <string>Language</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelName">
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
+            <widget class="QLineEdit" name="editSceneGrp"/>
+           </item>
+           <item row="8" column="1">
+            <widget class="QLineEdit" name="editSource"/>
+           </item>
+           <item row="3" column="2">
+            <widget class="QLabel" name="labelEpisodeNrDigits">
+             <property name="text">
+              <string>Digits</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="labelEpisodeNameSrc">
+             <property name="text">
+              <string>Episode Name Source</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QLineEdit" name="editAudio"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="labelEpisodeNrPrefix">
+             <property name="text">
+              <string>Prefix Episode Number</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="labelAudio">
+             <property name="text">
+              <string>Audio Info</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QLineEdit" name="editYear"/>
+           </item>
+           <item row="8" column="2">
+            <widget class="QLabel" name="labelVideo">
+             <property name="text">
+              <string>Video Info</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="labelYear">
+             <property name="text">
+              <string>Release Year</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="labelSource">
+             <property name="text">
+              <string>Source</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="labelScreneGrp">
+             <property name="text">
+              <string>Scene Group</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="checkboxCustomFileName">
+             <property name="text">
+              <string>Customize File Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Language</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QLabel" name="labelSeriesNrDigits">
+             <property name="text">
+              <string>Digits</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="labelSeriesNrPrefix">
+             <property name="text">
+              <string>Prefix Series Number</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="4">
+            <widget class="QPushButton" name="buttonCustomFileNameReset">
+             <property name="text">
+              <string>Reset</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="3" colspan="2">
+            <widget class="QLineEdit" name="editSeriesNrDigits">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>2</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="3" colspan="2">
+            <widget class="QLineEdit" name="editLang"/>
+           </item>
+           <item row="3" column="3" colspan="2">
+            <widget class="QLineEdit" name="editEpisodeNrDigits">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>2</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="3" colspan="2">
+            <widget class="QLineEdit" name="editResolution"/>
+           </item>
+           <item row="4" column="3" colspan="2">
+            <widget class="QComboBox" name="comboEpisodeNameLang"/>
+           </item>
+           <item row="8" column="3" colspan="2">
+            <widget class="QLineEdit" name="editVideo"/>
+           </item>
+           <item row="1" column="1" colspan="4">
+            <widget class="QLineEdit" name="editName"/>
+           </item>
+           <item row="0" column="1" colspan="3">
+            <widget class="QLineEdit" name="editCustomFileName"/>
+           </item>
+           <item row="5" column="0" colspan="5">
+            <widget class="Line" name="labelLang">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1533</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open Directory ...</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>currentList</tabstop>
+  <tabstop>renamePreview</tabstop>
+  <tabstop>checkboxOnlySelected</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>editRemoveLeft</tabstop>
+  <tabstop>editRemoveRight</tabstop>
+  <tabstop>editReplace1</tabstop>
+  <tabstop>editReplace2</tabstop>
+  <tabstop>editInsert1</tabstop>
+  <tabstop>editInsert2</tabstop>
+  <tabstop>editRemoveAt1</tabstop>
+  <tabstop>editRemoveAt2</tabstop>
+  <tabstop>editPrefix</tabstop>
+  <tabstop>editSuffix</tabstop>
+  <tabstop>editNumIdx</tabstop>
+  <tabstop>editNumInitV</tabstop>
+  <tabstop>editNumInc</tabstop>
+  <tabstop>editNumDigits</tabstop>
+  <tabstop>editName</tabstop>
+  <tabstop>editSeriesNrPrefix</tabstop>
+  <tabstop>editSeriesNrDigits</tabstop>
+  <tabstop>editEpisodeNrPrefix</tabstop>
+  <tabstop>editEpisodeNrDigits</tabstop>
+  <tabstop>comboEpisodeNameSrc</tabstop>
+  <tabstop>comboEpisodeNameLang</tabstop>
+  <tabstop>editYear</tabstop>
+  <tabstop>confirmButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+ <slots>
+  <slot>loadEntries()</slot>
+ </slots>
+</ui>

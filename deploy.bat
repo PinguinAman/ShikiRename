@@ -1,0 +1,2 @@
+"E:\Development\Qt\5.9.1\msvc2017_64\bin\windeployqt.exe" "C:\Users\Shiki\Documents\Visual Studio 2017\Projects\ShikiRename\x64\Release" --release --no-translations --no-opengl-sw --no-system-d3d-compiler --no-svg
+pause
