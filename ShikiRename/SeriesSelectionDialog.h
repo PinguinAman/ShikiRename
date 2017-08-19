@@ -22,7 +22,7 @@ public:
 	void setData(QJsonArray seriesData);
 
 	signals:
-	void seriesSelected(int id);
+	void closed(int id);
 
 	private slots:
 	void on_buttonOK_clicked();

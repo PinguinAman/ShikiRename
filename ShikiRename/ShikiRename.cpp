@@ -97,8 +97,8 @@ ShikiRename::ShikiRename(QWidget *parent) :
 
 	seriesSelectionDialog = new SeriesSelectionDialog(this);
 	connect(seriesSelectionDialog, SIGNAL(seriesSelected(int)), this, SLOT(on_seriesSelectedDialog_closed(int)));
+	
 }
-
 ShikiRename::~ShikiRename()
 {
 	delete ui;
@@ -107,13 +107,15 @@ ShikiRename::~ShikiRename()
 void ShikiRename::resizeEvent(QResizeEvent *event) {
 	this->fixGridLayoutWidth();
 }
-
 void ShikiRename::changeEvent(QEvent *event) {
 	if (event->type() == QEvent::WindowStateChange && this->windowState() == Qt::WindowMaximized) {
 		this->fixGridLayoutWidth();
 	}
 }
-
+void ShikiRename::on_tabWidget_currentChanged(const int &index) {
+	this->fixGridLayoutWidth();
+	this->previewRename();
+}
 void ShikiRename::fixGridLayoutWidth() {
 	QRect newSize1 = ui->tab_1->geometry();
 	newSize1.setHeight(ui->layoutWidget->height());
@@ -121,33 +123,6 @@ void ShikiRename::fixGridLayoutWidth() {
 	QRect newSize2 = ui->tab_2->geometry();
 	newSize2.setHeight(ui->gridLayoutWidget->height());
 	ui->gridLayoutWidget->setGeometry(newSize2);
-}
-
-void ShikiRename::open(QDir dir) {
-	dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-	infoList = dir.entryInfoList();
-
-	ui->renamePreview->clear();
-	ui->currentList->clear();
-
-	for (int i = 0; i < infoList.count(); i++) {
-		QString fn = infoList.at(i).fileName();
-		ui->renamePreview->addItem(fn);
-		ui->currentList->addItem(fn);
-	}
-	previewRename();
-}
-
-void ShikiRename::on_actionOpen_triggered()
-{
-	QDir dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), "/home", QFileDialog::ShowDirsOnly);
-	
-	if (dir.path() != ".") {
-		this->open(dir);
-	}
-	else {
-		qDebug() << "Current directory selected, assuming dialog has been canceled.";
-	}
 }
 
 void ShikiRename::on_editRemoveLeft_textChanged(const QString &arg1)
@@ -256,8 +231,6 @@ void ShikiRename::on_editNumDigits_textChanged(const QString &arg1)
 	if (input_num_idx >= 0 && input_num_init >= 0 && input_num_inc >= 0)
 		this->previewRename();
 }
-
-
 
 void ShikiRename::on_buttonCustomFileNameReset_clicked() {
 	ui->editCustomFileName->setText(DEFAULT_MEDIA_FILENAME_STRUCTURE);
@@ -389,12 +362,6 @@ void ShikiRename::on_editSceneGrp_textChanged(const QString &arg1)
 	generateReleaseDataSuffix();
 	this->previewRename();
 }
-void ShikiRename::on_checkboxEpDetection_toggled(const bool &checked)
-{
-	input_epDetection = checked;
-	this->previewRename();
-}
-
 
 void ShikiRename::on_checkboxOnlySelected_toggled(const bool &checked)
 {
@@ -410,6 +377,35 @@ void ShikiRename::on_currentList_itemSelectionChanged()
 	}
 	if (input_onlySelected) {
 		this->previewRename();
+	}
+}
+bool ShikiRename::isSelectedInList(QString filename) {
+	return (!input_onlySelected || input_onlySelected && selectedFilenames.contains(filename));
+}
+
+void ShikiRename::open(QDir dir) {
+	dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+	infoList = dir.entryInfoList();
+
+	ui->renamePreview->clear();
+	ui->currentList->clear();
+
+	for (int i = 0; i < infoList.count(); i++) {
+		QString fn = infoList.at(i).fileName();
+		ui->renamePreview->addItem(fn);
+		ui->currentList->addItem(fn);
+	}
+	previewRename();
+}
+void ShikiRename::on_actionOpen_triggered()
+{
+	QDir dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), "/home", QFileDialog::ShowDirsOnly);
+
+	if (dir.path() != ".") {
+		this->open(dir);
+	}
+	else {
+		qDebug() << "Current directory selected, assuming dialog has been canceled.";
 	}
 }
 void ShikiRename::on_actionUndo_triggered()
@@ -439,7 +435,6 @@ void ShikiRename::on_actionUndo_triggered()
 	this->open(dir);
 	this->previewRename();
 }
-
 void ShikiRename::on_actionRedo_triggered()
 {
 	if (hist_redo.size() <= 0)
@@ -465,35 +460,9 @@ void ShikiRename::on_actionRedo_triggered()
 	this->open(dir);
 	this->previewRename();
 }
-
-void ShikiRename::generateReleaseDataSuffix() {
-	QChar s(' ');
-	releaseDataSuffix = '[';
-	if (!input_vid_releaseYear.isNull() && !input_vid_releaseYear.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_releaseYear % s;
-	if (!input_vid_language.isNull() && !input_vid_language.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_language % s;
-	if (!input_vid_audio.isNull() && !input_vid_audio.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_audio % s;
-	if (!input_vid_videoResolution.isNull() && !input_vid_videoResolution.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_videoResolution % s;
-	if (!input_vid_src.isNull() && !input_vid_src.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_src % s;
-	if (!input_vid_video.isNull() && !input_vid_video.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_video % s;
-	if (!input_vid_sceneGrp.isNull() && !input_vid_sceneGrp.isEmpty()) {
-		if (releaseDataSuffix.endsWith(s))
-			releaseDataSuffix = releaseDataSuffix % QString("- ") % input_vid_sceneGrp % QChar(']');
-		else if (releaseDataSuffix.endsWith('['))
-			releaseDataSuffix = releaseDataSuffix % input_vid_sceneGrp % QChar(']');
-	}
-
-	if (releaseDataSuffix == "[")
-		releaseDataSuffix.clear();
-	else if (releaseDataSuffix.endsWith(' '))
-		releaseDataSuffix = releaseDataSuffix.left(releaseDataSuffix.length() - 1) % QChar(']');
+void ShikiRename::addToHistory(int id, QString o, QString n) {
+	hist_undo.push_back(std::make_tuple(id, o, n));
 }
-
 void ShikiRename::previewRename() {
 	QStringList previewFilenames;
 	QMutableListIterator<QFileInfo> it(infoList);
@@ -586,16 +555,6 @@ void ShikiRename::previewRename() {
 	ui->renamePreview->clear();
 	ui->renamePreview->insertItems(0, previewFilenames);
 }
-
-bool ShikiRename::isSelectedInList(QString filename) {
-	return (!input_onlySelected || input_onlySelected && selectedFilenames.contains(filename));
-}
-
-void ShikiRename::on_tabWidget_currentChanged(const int &index) {
-	this->fixGridLayoutWidth();
-	this->previewRename();
-}
-
 void ShikiRename::on_confirmButton_clicked()
 {
 	QMessageBox errorDialog_renameFailed;
@@ -661,10 +620,36 @@ void ShikiRename::on_confirmButton_clicked()
 	this->previewRename();
 }
 
-void ShikiRename::addToHistory(int id, QString o, QString n) {
-	hist_undo.push_back(std::make_tuple(id, o, n));
-}
+void ShikiRename::generateReleaseDataSuffix() {
+	QChar s(' ');
+	releaseDataSuffix = '[';
+	if (!input_vid_releaseYear.isNull() && !input_vid_releaseYear.isEmpty())
+		releaseDataSuffix = releaseDataSuffix % input_vid_releaseYear % s;
+	if (!input_vid_language.isNull() && !input_vid_language.isEmpty())
+		releaseDataSuffix = releaseDataSuffix % input_vid_language % s;
+	if (!input_vid_audio.isNull() && !input_vid_audio.isEmpty())
+		releaseDataSuffix = releaseDataSuffix % input_vid_audio % s;
+	if (!input_vid_videoResolution.isNull() && !input_vid_videoResolution.isEmpty())
+		releaseDataSuffix = releaseDataSuffix % input_vid_videoResolution % s;
+	if (!input_vid_src.isNull() && !input_vid_src.isEmpty())
+		releaseDataSuffix = releaseDataSuffix % input_vid_src % s;
+	if (!input_vid_video.isNull() && !input_vid_video.isEmpty())
+		releaseDataSuffix = releaseDataSuffix % input_vid_video % s;
+	if (!input_vid_sceneGrp.isNull() && !input_vid_sceneGrp.isEmpty()) {
+		if (releaseDataSuffix.endsWith(s))
+			releaseDataSuffix = releaseDataSuffix % QString("- ") % input_vid_sceneGrp % QChar(']');
+		else if (releaseDataSuffix.endsWith('['))
+			releaseDataSuffix = releaseDataSuffix % input_vid_sceneGrp % QChar(']');
+	}
 
+	if (releaseDataSuffix == "[")
+		releaseDataSuffix.clear();
+	else if (releaseDataSuffix.endsWith(' '))
+		releaseDataSuffix = releaseDataSuffix.left(releaseDataSuffix.length() - 1) % QChar(']');
+}
+QString ShikiRename::zerofy(QString string, int digits) {
+	return QString(digits - string.length(), '0') + string;
+}
 std::pair<int, int> ShikiRename::searchSeasonAndEpisode(QString filename_qs) {
 	std::string filename = filename_qs.toStdString();
 	std::regex rgx(R"([sS][^\d]*0*(\d+)[\s]*[^A-Za-z0-9]*[eE][^\d]*0*(\d+))");
@@ -678,17 +663,12 @@ std::pair<int, int> ShikiRename::searchSeasonAndEpisode(QString filename_qs) {
 	return result;
 }
 
-QString ShikiRename::zerofy(QString string, int digits) {
-	return QString(digits - string.length(), '0') + string;
-}
-
 void ShikiRename::openDialogSeriesSelection(QJsonArray seriesData) {
 	seriesSelectionDialog->setData(seriesData);
 	seriesSelectionDialog->show();
 }
-
 void ShikiRename::on_seriesSelectedDialog_closed(int id) {
-	this->tvdbFindEpisodes(id);
+	this->tvdbFindEpisodes(id, 1);
 }
 
 void ShikiRename::handleNetworkReply(QNetworkReply* reply) {
@@ -765,6 +745,13 @@ void ShikiRename::handleNetworkReply(QNetworkReply* reply) {
 
 	}
 }
+bool ShikiRename::onlineDbAvailable() {
+	if (input_vid_eNameSrc == MetaDB::TheTVDB && !tvdbAuthToken.isEmpty() && !tvdbAuthToken.isNull())
+		return true;
+
+	qDebug() << "Selected online meta database is not available.";
+	return false;
+}
 
 void ShikiRename::tvdbAuth() {
 	QJsonObject json
@@ -784,7 +771,6 @@ void ShikiRename::tvdbAuth() {
 	tvdbAuthTimer->start(5000);
 	connect(tvdbAuthTimer, SIGNAL(timeout()), this, SLOT(tvdbAuthError()));
 }
-
 void ShikiRename::tvdbAuthError() {
 	tvdbAuthTimer->stop();
 	if (tvdbAuthToken.isNull()) {
@@ -803,16 +789,14 @@ void ShikiRename::tvdbAuthError() {
 	}
 	this->tvdbGetLanguages();
 }
-
 void ShikiRename::tvdbAuthorizeRequest(QNetworkRequest *request) {
 	request->setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + tvdbAuthToken));
 }
-
 void ShikiRename::tvdbFindSeries(QString name) {
+	tvdbSearchDelayTimer->stop();
 	if (!onlineDbAvailable())
 		return;
 
-	tvdbSearchDelayTimer->stop();
 	if (!name.isNull() && !name.isEmpty()) {
 		QUrl url("https://api.thetvdb.com/search/series");
 		QUrlQuery query;
@@ -825,11 +809,6 @@ void ShikiRename::tvdbFindSeries(QString name) {
 		manager->get(request);
 	}
 }
-
-void ShikiRename::tvdbFindEpisodes(int seriesId) {
-	tvdbFindEpisodes(seriesId, 1);
-}
-
 void ShikiRename::tvdbFindEpisodes(int seriesId, int page) {
 	if (!onlineDbAvailable())
 		return;
@@ -844,7 +823,6 @@ void ShikiRename::tvdbFindEpisodes(int seriesId, int page) {
 	request.setRawHeader(QByteArray("Accept-Language"), input_vid_eNameLang.toLocal8Bit());
 	manager->get(request);
 }
-
 void ShikiRename::tvdbGetLanguages() {
 	if (!onlineDbAvailable())
 		return;
@@ -853,12 +831,4 @@ void ShikiRename::tvdbGetLanguages() {
 	QNetworkRequest request(url);
 	tvdbAuthorizeRequest(&request);
 	manager->get(request);
-}
-
-bool ShikiRename::onlineDbAvailable() {
-	if (input_vid_eNameSrc == MetaDB::TheTVDB && !tvdbAuthToken.isEmpty() && !tvdbAuthToken.isNull())
-		return true;
-
-	qDebug() << "Selected online meta database is not available.";
-	return false;
 }

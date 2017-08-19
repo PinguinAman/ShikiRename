@@ -26,18 +26,9 @@ public:
 	explicit ShikiRename(QWidget *parent = 0);
 	~ShikiRename();
 
-	void resizeEvent(QResizeEvent * event);
-	void changeEvent(QEvent * event);
-	void fixGridLayoutWidth();
-
 	private slots:
-	void openDialogSeriesSelection(QJsonArray seriesData);
-	void on_seriesSelectedDialog_closed(int id);
+	void on_tabWidget_currentChanged(const int &index);
 
-	void on_actionOpen_triggered();
-	void on_actionUndo_triggered();
-	void on_actionRedo_triggered();
-	void on_confirmButton_clicked();
 	void on_editRemoveRight_textChanged(const QString &arg1);
 	void on_editRemoveLeft_textChanged(const QString &arg1);
 	void on_editReplace1_textChanged(const QString &arg1);
@@ -52,9 +43,10 @@ public:
 	void on_editNumInitV_textChanged(const QString &arg1);
 	void on_editNumInc_textChanged(const QString &arg1);
 	void on_editNumDigits_textChanged(const QString &arg1);
+
+	void on_buttonCustomFileNameReset_clicked();
 	void on_checkboxCustomFileName_toggled(const bool &checked);
 	void on_editCustomFileName_textChanged(const QString &arg1);
-	void on_buttonCustomFileNameReset_clicked();
 	void on_editName_textChanged(const QString &arg1);
 	void on_editSeriesNrPrefix_textChanged(const QString &arg1);
 	void on_editEpisodeNrPrefix_textChanged(const QString &arg1);
@@ -69,17 +61,22 @@ public:
 	void on_editVideo_textChanged(const QString &arg1);
 	void on_editSource_textChanged(const QString &arg1);
 	void on_editSceneGrp_textChanged(const QString &arg1);
-	void on_checkboxEpDetection_toggled(const bool &checked);
+
 	void on_checkboxOnlySelected_toggled(const bool &checked);
 	void on_currentList_itemSelectionChanged();
-	void on_tabWidget_currentChanged(const int &index);
+
+	void on_actionOpen_triggered();
+	void on_actionUndo_triggered();
+	void on_actionRedo_triggered();
+
+	void on_confirmButton_clicked();
+
+	void openDialogSeriesSelection(QJsonArray seriesData);
+	void on_seriesSelectedDialog_closed(int id);
 
 	void handleNetworkReply(QNetworkReply* reply);
 	void tvdbAuthError();
 	void tvdbFindSeries(QString name);
-	void tvdbFindEpisodes(int seriesId);
-	void tvdbFindEpisodes(int seriesId, int page);
-
 
 private:
 	Ui::ShikiRenameClass *ui;
@@ -89,17 +86,26 @@ private:
 	const enum MetaDB { None = 0, TheTVDB = 1 };
 	QString invalidFnCharset_win;
 
-	void open(QDir dir);
-	void previewRename();
-	void generateReleaseDataSuffix();
+	void resizeEvent(QResizeEvent * event);
+	void changeEvent(QEvent * event);
+	void fixGridLayoutWidth();
+
 	bool isSelectedInList(QString filename);
+
+	void open(QDir dir);
 	void addToHistory(int id, QString o, QString n);
-	std::pair<int, int> searchSeasonAndEpisode(QString filename_qs);
+	void previewRename();
+
+	void generateReleaseDataSuffix();
 	QString zerofy(QString string, int digits);
+	std::pair<int, int> searchSeasonAndEpisode(QString filename_qs);
+
+	bool onlineDbAvailable();
+
 	void tvdbAuth();
 	void tvdbAuthorizeRequest(QNetworkRequest *request);
+	void tvdbFindEpisodes(int seriesId, int page);
 	void tvdbGetLanguages();
-	bool onlineDbAvailable();
 
 	QFileInfoList infoList;
 	QStringList filenames;

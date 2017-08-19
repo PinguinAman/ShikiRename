@@ -57,7 +57,7 @@ void SeriesSelectionDialog::setData(QJsonArray seriesData) {
 void SeriesSelectionDialog::on_buttonOK_clicked() {
 	int selectedRow = ui_seriesSelect->tableSeriesSelect->currentRow();
 	int seriesId = ui_seriesSelect->tableSeriesSelect->item(selectedRow, 0)->text().toInt();
-	emit seriesSelected(seriesId);
+	emit closed(seriesId);
 	this->close();
 }
 
