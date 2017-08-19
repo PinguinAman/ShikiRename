@@ -72,7 +72,7 @@ public:
 	void on_confirmButton_clicked();
 
 	void openDialogSeriesSelection(QJsonArray seriesData);
-	void on_seriesSelectedDialog_closed(int id);
+	void on_seriesSelectedDialog_closed(int id, QString name);
 
 	void handleNetworkReply(QNetworkReply* reply);
 	void tvdbAuthError();
@@ -96,7 +96,6 @@ private:
 	void addToHistory(int id, QString o, QString n);
 	void previewRename();
 
-	void generateReleaseDataSuffix();
 	QString zerofy(QString string, int digits);
 	std::pair<int, int> searchSeasonAndEpisode(QString filename_qs);
 
@@ -148,7 +147,7 @@ private:
 	QString input_vid_sceneGrp;
 	QString releaseDataSuffix;
 	bool input_epDetection = false;
-
+	bool ongoingSeriesSelection = false;
 	QNetworkAccessManager *manager;
 	QByteArray tvdbAuthToken;
 	QTimer *tvdbAuthTimer;
@@ -156,6 +155,8 @@ private:
 	QTimer *tvdbSearchDelayTimer;
 
 	QJsonArray episodeData;
+
+
 };
 
 #endif // SHIKIRENAME_H

@@ -96,7 +96,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	connect(tvdbSearchDelayTimer, &QTimer::timeout, this, [this] { tvdbFindSeries(input_vid_name); });	//https://stackoverflow.com/a/22411267
 
 	seriesSelectionDialog = new SeriesSelectionDialog(this);
-	connect(seriesSelectionDialog, SIGNAL(seriesSelected(int)), this, SLOT(on_seriesSelectedDialog_closed(int)));
+	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
 	
 }
 ShikiRename::~ShikiRename()
@@ -248,9 +248,8 @@ void ShikiRename::on_editCustomFileName_textChanged(const QString &arg1)
 void ShikiRename::on_editName_textChanged(const QString &arg1)
 {
 	input_vid_name = arg1;
-	qDebug() << input_vid_name;
 
-	if (onlineDbAvailable()) {
+	if (onlineDbAvailable() && !ongoingSeriesSelection) {
 		tvdbSearchDelayTimer->start(1000);
 	}
 	else {
@@ -323,43 +322,36 @@ void ShikiRename::on_comboEpisodeNameLang_currentIndexChanged(const int &index)
 void ShikiRename::on_editYear_textChanged(const QString &arg1)
 {
 	input_vid_releaseYear = arg1;
-	generateReleaseDataSuffix();
 	this->previewRename();
 }
 void ShikiRename::on_editLang_textChanged(const QString &arg1)
 {
 	input_vid_language = arg1;
-	generateReleaseDataSuffix();
 	this->previewRename();
 }
 void ShikiRename::on_editAudio_textChanged(const QString &arg1)
 {
 	input_vid_audio = arg1;
-	generateReleaseDataSuffix();
 	this->previewRename();
 }
 void ShikiRename::on_editResolution_textChanged(const QString &arg1)
 {
 	input_vid_videoResolution = arg1;
-	generateReleaseDataSuffix();
 	this->previewRename();
 }
 void ShikiRename::on_editVideo_textChanged(const QString &arg1)
 {
 	input_vid_video = arg1;
-	generateReleaseDataSuffix();
 	this->previewRename();
 }
 void ShikiRename::on_editSource_textChanged(const QString &arg1)
 {
 	input_vid_src = arg1;
-	generateReleaseDataSuffix();
 	this->previewRename();
 }
 void ShikiRename::on_editSceneGrp_textChanged(const QString &arg1)
 {
 	input_vid_sceneGrp = arg1;
-	generateReleaseDataSuffix();
 	this->previewRename();
 }
 
@@ -620,33 +612,6 @@ void ShikiRename::on_confirmButton_clicked()
 	this->previewRename();
 }
 
-void ShikiRename::generateReleaseDataSuffix() {
-	QChar s(' ');
-	releaseDataSuffix = '[';
-	if (!input_vid_releaseYear.isNull() && !input_vid_releaseYear.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_releaseYear % s;
-	if (!input_vid_language.isNull() && !input_vid_language.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_language % s;
-	if (!input_vid_audio.isNull() && !input_vid_audio.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_audio % s;
-	if (!input_vid_videoResolution.isNull() && !input_vid_videoResolution.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_videoResolution % s;
-	if (!input_vid_src.isNull() && !input_vid_src.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_src % s;
-	if (!input_vid_video.isNull() && !input_vid_video.isEmpty())
-		releaseDataSuffix = releaseDataSuffix % input_vid_video % s;
-	if (!input_vid_sceneGrp.isNull() && !input_vid_sceneGrp.isEmpty()) {
-		if (releaseDataSuffix.endsWith(s))
-			releaseDataSuffix = releaseDataSuffix % QString("- ") % input_vid_sceneGrp % QChar(']');
-		else if (releaseDataSuffix.endsWith('['))
-			releaseDataSuffix = releaseDataSuffix % input_vid_sceneGrp % QChar(']');
-	}
-
-	if (releaseDataSuffix == "[")
-		releaseDataSuffix.clear();
-	else if (releaseDataSuffix.endsWith(' '))
-		releaseDataSuffix = releaseDataSuffix.left(releaseDataSuffix.length() - 1) % QChar(']');
-}
 QString ShikiRename::zerofy(QString string, int digits) {
 	return QString(digits - string.length(), '0') + string;
 }
@@ -667,7 +632,10 @@ void ShikiRename::openDialogSeriesSelection(QJsonArray seriesData) {
 	seriesSelectionDialog->setData(seriesData);
 	seriesSelectionDialog->show();
 }
-void ShikiRename::on_seriesSelectedDialog_closed(int id) {
+void ShikiRename::on_seriesSelectedDialog_closed(int id, QString name) {
+	ongoingSeriesSelection = true;
+	ui->editName->setText(name);
+	ongoingSeriesSelection = false;
 	this->tvdbFindEpisodes(id, 1);
 }
 
