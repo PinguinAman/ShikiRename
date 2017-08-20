@@ -131,6 +131,8 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	seriesSelectionDialog = new SeriesSelectionDialog(this);
 	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
 
+	renameConfirmationDialog = new RenameConfirmationDialog(this);
+
 }
 ShikiRename::~ShikiRename()
 {
@@ -602,22 +604,33 @@ void ShikiRename::on_buttonRename_clicked()
 	for (int i = 0; i < ui->renamePreview->count(); i++) {
 		targetNames.append(ui->renamePreview->item(i)->text());
 	}
-	targetNames.sort();
+	renameConfirmationDialog->setTargetNameList(targetNames);
+	if (renameConfirmationDialog->exec()) {
+		targetNames = renameConfirmationDialog->getTargetNameList();
+	}
+	else {
+		return;
+	}
+
+	ui->renamePreview->clear();
+	ui->renamePreview->addItems(targetNames);
+	QStringList targetNames_sorted = targetNames;
+	targetNames_sorted.sort();
 
 	bool dupe_found = false;
 	QList<QColor> appropiateTextColors = { Qt::red, Qt::blue, Qt::green, Qt::cyan, Qt::magenta, Qt::darkYellow };
 	int appropiateTextColorIterator = 0;
-	for (int i = 0; i < targetNames.count() - 1; i++) {
-		if (targetNames.at(i).compare(targetNames.at(i + 1), Qt::CaseInsensitive) == 0) {							//check if there are duplicate filenames
+	for (int i = 0; i < targetNames_sorted.count() - 1; i++) {
+		if (targetNames_sorted.at(i).compare(targetNames_sorted.at(i + 1), Qt::CaseInsensitive) == 0) {							//check if there are duplicate filenames
 			dupe_found = true;																							//there are dupes, so we won't rename
-			QList<QListWidgetItem *> li = ui->renamePreview->findItems(targetNames.at(i), Qt::MatchFixedString);			//get all dupe items in preview
+			QList<QListWidgetItem *> li = ui->renamePreview->findItems(targetNames_sorted.at(i), Qt::MatchFixedString);			//get all dupe items in preview
 			for (auto item : li)
 				item->setTextColor(appropiateTextColors.at(appropiateTextColorIterator%appropiateTextColors.length()));		//mark dupes in preview
 			appropiateTextColorIterator++;
 		}
 	}
 	if (dupe_found) {
-		ui->buttonRename->setDisabled(true);
+		//ui->buttonRename->setDisabled(true);	//user may edit it manually, so we no longer disable the rename button.
 		errorDialog_renameFailed.setInformativeText("Rename failed because duplicate filenames have been found. Check your preview list and resolve any marked conflicts.");
 		errorDialog_renameFailed.exec();
 		return;
@@ -626,17 +639,19 @@ void ShikiRename::on_buttonRename_clicked()
 	for (int i = 0; i < ui->renamePreview->count(); i++) {
 		if (isSelectedInList(ui->currentList->item(i)->text())) {
 			QString oldName = infoList.at(i).absoluteFilePath();														//original file
-			QString newName = infoList.at(i).absolutePath() % QString("\\") % ui->renamePreview->item(i)->text();		//new file
+			QString newName = infoList.at(i).absolutePath() % QChar('/') % ui->renamePreview->item(i)->text();		//new file
 
-			if (!QFile::rename(oldName, newName)) {		//rename file
-				errorDialog_renameFailed.setInformativeText("Failed to rename \"" % oldName % "\" to \"" % newName % "\"!");
-				errorDialog_renameFailed.exec();
-			}
-			else
-			{
-				this->addToHistory(actionHistoryId, oldName, newName);													//add rename to history
-				if (!ui->actionUndo->isEnabled()) {
-					ui->actionUndo->setEnabled(true);																	//activate undo button in menu bar
+			if (oldName != newName) {
+				if (!QFile::rename(oldName, newName)) {		//rename file
+					errorDialog_renameFailed.setInformativeText("Failed to rename \"" % oldName % "\" to \"" % newName % "\"!");
+					errorDialog_renameFailed.exec();
+				}
+				else
+				{
+					this->addToHistory(actionHistoryId, oldName, newName);													//add rename to history
+					if (!ui->actionUndo->isEnabled()) {
+						ui->actionUndo->setEnabled(true);																	//activate undo button in menu bar
+					}
 				}
 			}
 		}
@@ -776,7 +791,7 @@ void ShikiRename::tvdbAuth() {
 
 	tvdbAuthTimer = new QTimer(this);
 	tvdbAuthTimer->setSingleShot(true);
-	tvdbAuthTimer->start(5000);
+	tvdbAuthTimer->start(TVDB_TIMEOUT);
 	connect(tvdbAuthTimer, SIGNAL(timeout()), this, SLOT(tvdbAuthError()));
 }
 void ShikiRename::tvdbAuthError() {

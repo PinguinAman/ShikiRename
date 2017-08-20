@@ -30,7 +30,7 @@ public:
 
 
 private:
-	Ui::SeriesSelectionDialog *ui_seriesSelect;
+	Ui::SeriesSelectionDialog *ui;
 };
 
 #endif // SHIKIRENAME_SSD_H

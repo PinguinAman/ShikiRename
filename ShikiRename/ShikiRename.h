@@ -8,6 +8,7 @@
 #include <limits>
 #include <QtNetwork/QNetworkReply>
 #include <SeriesSelectionDialog.h>
+#include <RenameConfirmationDialog.h>
 #include <QList>
 #include <QTableWidgetItem>
 #include <QJsonArray>
@@ -81,9 +82,11 @@ public:
 private:
 	Ui::ShikiRenameClass *ui;
 	SeriesSelectionDialog *seriesSelectionDialog;
+	RenameConfirmationDialog *renameConfirmationDialog;
 
 	const QString DEFAULT_MEDIA_FILENAME_STRUCTURE = "<NAME> - <SEASON PREFIX><SEASON><EPISODE PREFIX><EPISODE> - <EPISODE NAME> - [<YEAR> <LANGUAGE> <AUDIO> <RESOLUTION> <SOURCE> <VIDEO> - <SCENE GROUP>]";
 	const enum MetaDB { None = 0, TheTVDB = 1 };
+	const int TVDB_TIMEOUT = 20000;	//ms
 	QString invalidFnCharset_win;
 
 	void resizeEvent(QResizeEvent * event);
