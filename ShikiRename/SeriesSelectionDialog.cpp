@@ -17,6 +17,7 @@ SeriesSelectionDialog::~SeriesSelectionDialog()
 }
 
 void SeriesSelectionDialog::on_buttonCancel_clicked() {
+	emit closed(-1, NULL);
 	this->close();
 }
 

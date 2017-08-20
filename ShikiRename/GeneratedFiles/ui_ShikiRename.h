@@ -42,7 +42,7 @@ public:
     QAction *actionRedo;
     QWidget *centralWidget;
     QGridLayout *gridLayout_2;
-    QPushButton *confirmButton;
+    QPushButton *buttonRename;
     QVBoxLayout *verticalLayout;
     QHBoxLayout *horizontalLayout_2;
     QListWidget *currentList;
@@ -144,10 +144,10 @@ public:
         gridLayout_2->setSpacing(6);
         gridLayout_2->setContentsMargins(11, 11, 11, 11);
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        confirmButton = new QPushButton(centralWidget);
-        confirmButton->setObjectName(QStringLiteral("confirmButton"));
+        buttonRename = new QPushButton(centralWidget);
+        buttonRename->setObjectName(QStringLiteral("buttonRename"));
 
-        gridLayout_2->addWidget(confirmButton, 1, 1, 1, 1);
+        gridLayout_2->addWidget(buttonRename, 1, 1, 1, 1);
 
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(6);
@@ -580,7 +580,7 @@ public:
         QWidget::setTabOrder(editEpisodeNrDigits, comboEpisodeNameSrc);
         QWidget::setTabOrder(comboEpisodeNameSrc, comboEpisodeNameLang);
         QWidget::setTabOrder(comboEpisodeNameLang, editYear);
-        QWidget::setTabOrder(editYear, confirmButton);
+        QWidget::setTabOrder(editYear, buttonRename);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
@@ -602,7 +602,7 @@ public:
         actionOpen->setText(QApplication::translate("ShikiRenameClass", "Open Directory ...", Q_NULLPTR));
         actionUndo->setText(QApplication::translate("ShikiRenameClass", "Undo", Q_NULLPTR));
         actionRedo->setText(QApplication::translate("ShikiRenameClass", "Redo", Q_NULLPTR));
-        confirmButton->setText(QApplication::translate("ShikiRenameClass", "Rename", Q_NULLPTR));
+        buttonRename->setText(QApplication::translate("ShikiRenameClass", "Rename", Q_NULLPTR));
         checkboxOnlySelected->setText(QApplication::translate("ShikiRenameClass", "Rename only selected entries", Q_NULLPTR));
         labelRemoveLeft2->setText(QApplication::translate("ShikiRenameClass", "characters", Q_NULLPTR));
         labelRemoveRight2->setText(QApplication::translate("ShikiRenameClass", "characters", Q_NULLPTR));

@@ -69,10 +69,10 @@ public:
 	void on_actionUndo_triggered();
 	void on_actionRedo_triggered();
 
-	void on_confirmButton_clicked();
+	void on_buttonRename_clicked();
 
 	void openDialogSeriesSelection(QJsonArray seriesData);
-	void on_seriesSelectedDialog_closed(int id, QString name);
+	void on_seriesSelectedDialog_closed(const int &id, const QString &name);
 
 	void handleNetworkReply(QNetworkReply* reply);
 	void tvdbAuthError();

@@ -48,42 +48,75 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->editNumDigits->setValidator(new QIntValidator(1, MAX_INT, this));
 
 	//TAB2
+	////Tooltip strings
+	QString tt_SNAME = "Name of the series";
+	QString tt_EPNSS = "Source to use for episode names";
+	QString tt_EPNLS = "Language to use for episode names";
+	QString tt_SPREF = "Prefix for season numbers";
+	QString tt_SNUMB = "Season numbers";
+	QString tt_EPREF = "Prefix for episode numbers";
+	QString tt_ENUMB = "Prefix for season numbers";
+	QString tt_ENAME = "Name of the episodes (provided by the selected source)";
+	QString tt_RYEAR = "Year the series (or season) started";
+	QString tt_SLANG = "Primary language of the release, possibly subtitle language if important (e.g. <i>German</i> or <i>Japanese Dubbed German Subbed</i> or <i>JAP-Dub GER-Sub</i>)";
+	QString tt_AUDIO = "Primary audio codec (e.g. <i>DTS</i> or <i>AC3</i>)";
+	QString tt_RESOL = "Video resolution (e.g. <i>1080p</i> or <i>720p</i>)";
+	QString tt_SOURC = "Primary source of the release (usually refers to video source) (e.g. <i>BluRay</i> or <i>HDDVD</i>)";
+	QString tt_VIDEO = "Used video codec (e.g. <i>x264</i> or <i>XViD</i>)";
+	QString tt_GROUP = "The scene group providing this release (obviously refers to pirated copies)";
+	QString tt_CNAME = QString("<p>Available tags:</p>")
+		% QString("<b>&lt;NAME&gt;</b> - ") % tt_SNAME
+		% QString("<br><b>&lt;SEASON PREFIX&gt;</b> - ") % tt_SPREF
+		% QString("<br><b>&lt;SEASON&gt;</b> - ") % tt_SNUMB
+		% QString("<br><b>&lt;EPISODE PREFIX&gt;</b> - ") % tt_EPREF
+		% QString("<br><b>&lt;EPISODE&gt;</b> - ") % tt_ENUMB
+		% QString("<br><b>&lt;EPISODE NAME&gt;</b> - ") % tt_ENAME
+		% QString("<br><b>&lt;YEAR&gt;</b> - ") % tt_RYEAR
+		% QString("<br><b>&lt;LANGUAGE&gt;</b> - ") % tt_SLANG
+		% QString("<br><b>&lt;AUDIO&gt;</b> - ") % tt_AUDIO
+		% QString("<br><b>&lt;RESOLUTION&gt;</b> - ") % tt_RESOL
+		% QString("<br><b>&lt;SOURCE&gt;</b> - ") % tt_SOURC
+		% QString("<br><b>&lt;VIDEO&gt;</b> - ") % tt_VIDEO
+		% QString("<br><b>&lt;SCENE GROUP&gt;</b> - ") % tt_GROUP;
+	////Tooltip setup
 	ui->editCustomFileName->setText(DEFAULT_MEDIA_FILENAME_STRUCTURE);
 	ui->editCustomFileName->setEnabled(false);
-	ui->editCustomFileName->setToolTip(
-		QString("<p>Available tags:</p>")
-		% QString("<b>&lt;NAME&gt;</b> - Name of the series")
-		% QString("<br><b>&lt;SEASON PREFIX&gt;</b> - Prefix for season numbers")
-		% QString("<br><b>&lt;SEASON&gt;</b> - Season numbers")
-		% QString("<br><b>&lt;EPISODE PREFIX&gt;</b> - Prefix for episode numbers")
-		% QString("<br><b>&lt;EPISODE&gt;</b> - Episode numbers")
-		% QString("<br><b>&lt;EPISODE NAME&gt;</b> - Name of the episodes (provided by the selected source)")
-		% QString("<br><b>&lt;YEAR&gt;</b> - Year the series (or season) started")
-		% QString("<br><b>&lt;LANGUAGE&gt;</b> - Primary language of the release, possibly subtitle language if important (e.g. <i>German</i> or <i>Japanese Dubbed German Subbed</i> or <i>JAP-Dub GER-Sub</i>)")
-		% QString("<br><b>&lt;AUDIO&gt;</b> - Primary audio codec (e.g. <i>DTS</i> or <i>AC3</i>)")
-		% QString("<br><b>&lt;RESOLUTION&gt;</b> - Video resolution (e.g. <i>1080p</i> or <i>720p</i>)")
-		% QString("<br><b>&lt;SOURCE&gt;</b> - Primary source of the release (usually refers to video source) (e.g. <i>BluRay</i> or <i>HDDVD</i>)")
-		% QString("<br><b>&lt;VIDEO&gt;</b> - Used video codec (e.g. <i>x264</i> or <i>XViD</i>)")
-		% QString("<br><b>&lt;SCENE GROUP&gt;</b> - The scene group providing this release (obviously refers to pirated copies)"));
+	ui->editCustomFileName->setToolTip(tt_CNAME);
 	ui->editName->setValidator(WIN_INVALID_FN);
+	ui->editName->setToolTip(tt_SNAME);
+	ui->comboEpisodeNameSrc->setToolTip(tt_EPNSS);
 	ui->comboEpisodeNameLang->addItem("");
+	ui->comboEpisodeNameLang->setToolTip(tt_EPNLS);
 	ui->editSeriesNrPrefix->setValidator(WIN_INVALID_FN);
+	ui->editSeriesNrPrefix->setToolTip(tt_SPREF);
 	ui->editSeriesNrDigits->setValidator(new QIntValidator(1, MAX_INT, this));
+	ui->editSeriesNrDigits->setToolTip(tt_SNUMB);
 	ui->editEpisodeNrPrefix->setValidator(WIN_INVALID_FN);
+	ui->editEpisodeNrPrefix->setToolTip(tt_EPREF);
 	ui->editEpisodeNrDigits->setValidator(new QIntValidator(1, MAX_INT, this));
+	ui->editEpisodeNrDigits->setToolTip(tt_ENUMB);
 	ui->editYear->setValidator(WIN_INVALID_FN);
+	ui->editYear->setToolTip(tt_RYEAR);
 	ui->editLang->setValidator(WIN_INVALID_FN);
+	ui->editLang->setToolTip(tt_SLANG);
 	ui->editAudio->setValidator(WIN_INVALID_FN);
+	ui->editAudio->setToolTip(tt_AUDIO);
 	ui->editResolution->setValidator(WIN_INVALID_FN);
+	ui->editResolution->setToolTip(tt_RESOL);
 	ui->editSource->setValidator(WIN_INVALID_FN);
+	ui->editSource->setToolTip(tt_SOURC);
 	ui->editVideo->setValidator(WIN_INVALID_FN);
+	ui->editVideo->setToolTip(tt_VIDEO);
 	ui->editSceneGrp->setValidator(WIN_INVALID_FN);
+	ui->editSceneGrp->setToolTip(tt_GROUP);
 
 	//Menubar
 	ui->actionUndo->setEnabled(false);
 	ui->actionRedo->setEnabled(false);
 	ui->actionUndo->setShortcut(tr("CTRL+Z"));
 	ui->actionRedo->setShortcut(tr("CTRL+Y"));
+
+	ui->buttonRename->setDisabled(true);
 
 	//Network requests
 	manager = new QNetworkAccessManager(this);
@@ -97,7 +130,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 
 	seriesSelectionDialog = new SeriesSelectionDialog(this);
 	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
-	
+
 }
 ShikiRename::~ShikiRename()
 {
@@ -526,18 +559,18 @@ void ShikiRename::previewRename() {
 
 				v = input_vid_customFileNameRaw;
 				v.replace(QString("<NAME>"), input_vid_name)
-					.replace(QString(R"(<SEASON PREFIX>)"), input_vid_sPrefix)
-					.replace(QString(R"(<SEASON>)"), this->zerofy(QString::number(s_e.first), input_vid_sDigits))
-					.replace(QString(R"(<EPISODE PREFIX>)"), input_vid_ePrefix)
-					.replace(QString(R"(<EPISODE>)"), this->zerofy(QString::number(s_e.second), input_vid_eDigits))
-					.replace(QString(R"(<EPISODE NAME>)"), episodeName)
-					.replace(QString(R"(<YEAR>)"), input_vid_releaseYear)
-					.replace(QString(R"(<LANGUAGE>)"), input_vid_language)
-					.replace(QString(R"(<AUDIO>)"), input_vid_audio)
-					.replace(QString(R"(<RESOLUTION>)"), input_vid_videoResolution)
-					.replace(QString(R"(<SOURCE>)"), input_vid_src)
-					.replace(QString(R"(<VIDEO>)"), input_vid_video)
-					.replace(QString(R"(<SCENE GROUP>)"), input_vid_sceneGrp);
+					.replace(QString("<SEASON PREFIX>"), input_vid_sPrefix)
+					.replace(QString("<SEASON>"), this->zerofy(QString::number(s_e.first), input_vid_sDigits))
+					.replace(QString("<EPISODE PREFIX>"), input_vid_ePrefix)
+					.replace(QString("<EPISODE>"), this->zerofy(QString::number(s_e.second), input_vid_eDigits))
+					.replace(QString("<EPISODE NAME>"), episodeName)
+					.replace(QString("<YEAR>"), input_vid_releaseYear)
+					.replace(QString("<LANGUAGE>"), input_vid_language)
+					.replace(QString("<AUDIO>"), input_vid_audio)
+					.replace(QString("<RESOLUTION>"), input_vid_videoResolution)
+					.replace(QString("<SOURCE>"), input_vid_src)
+					.replace(QString("<VIDEO>"), input_vid_video)
+					.replace(QString("<SCENE GROUP>"), input_vid_sceneGrp);
 				v.remove(rgx_invalidFnCharset_win);
 			}
 		}
@@ -546,8 +579,9 @@ void ShikiRename::previewRename() {
 
 	ui->renamePreview->clear();
 	ui->renamePreview->insertItems(0, previewFilenames);
+	ui->buttonRename->setEnabled(ui->renamePreview->count() > 0);
 }
-void ShikiRename::on_confirmButton_clicked()
+void ShikiRename::on_buttonRename_clicked()
 {
 	QMessageBox errorDialog_renameFailed;
 	errorDialog_renameFailed.setText("<b>Rename failed!</b>");
@@ -571,7 +605,7 @@ void ShikiRename::on_confirmButton_clicked()
 	targetNames.sort();
 
 	bool dupe_found = false;
-	QList<QColor> appropiateTextColors = {Qt::red, Qt::blue, Qt::green, Qt::cyan, Qt::magenta, Qt::darkYellow};
+	QList<QColor> appropiateTextColors = { Qt::red, Qt::blue, Qt::green, Qt::cyan, Qt::magenta, Qt::darkYellow };
 	int appropiateTextColorIterator = 0;
 	for (int i = 0; i < targetNames.count() - 1; i++) {
 		if (targetNames.at(i).compare(targetNames.at(i + 1), Qt::CaseInsensitive) == 0) {							//check if there are duplicate filenames
@@ -583,6 +617,7 @@ void ShikiRename::on_confirmButton_clicked()
 		}
 	}
 	if (dupe_found) {
+		ui->buttonRename->setDisabled(true);
 		errorDialog_renameFailed.setInformativeText("Rename failed because duplicate filenames have been found. Check your preview list and resolve any marked conflicts.");
 		errorDialog_renameFailed.exec();
 		return;
@@ -632,11 +667,16 @@ void ShikiRename::openDialogSeriesSelection(QJsonArray seriesData) {
 	seriesSelectionDialog->setData(seriesData);
 	seriesSelectionDialog->show();
 }
-void ShikiRename::on_seriesSelectedDialog_closed(int id, QString name) {
-	ongoingSeriesSelection = true;
-	ui->editName->setText(name);
-	ongoingSeriesSelection = false;
-	this->tvdbFindEpisodes(id, 1);
+void ShikiRename::on_seriesSelectedDialog_closed(const int &id, const QString &name) {
+	if (id == -1) {
+		this->previewRename();
+	}
+	else {
+		ongoingSeriesSelection = true;
+		ui->editName->setText(name);
+		ongoingSeriesSelection = false;
+		this->tvdbFindEpisodes(id, 1);
+	}
 }
 
 void ShikiRename::handleNetworkReply(QNetworkReply* reply) {
