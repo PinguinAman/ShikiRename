@@ -49,10 +49,11 @@ public:
 	void on_checkboxCustomFileName_toggled(const bool &checked);
 	void on_editCustomFileName_textChanged(const QString &arg1);
 	void on_editName_textChanged(const QString &arg1);
-	void on_editSeriesNrPrefix_textChanged(const QString &arg1);
+	void on_editSeasonNrPrefix_textChanged(const QString &arg1);
 	void on_editEpisodeNrPrefix_textChanged(const QString &arg1);
-	void on_editSeriesNrDigits_textChanged(const QString &arg1);
+	void on_editSeasonNrDigits_textChanged(const QString &arg1);
 	void on_editEpisodeNrDigits_textChanged(const QString &arg1);
+	void on_checkboxNoSeason_toggled(const bool &checked);
 	void on_comboEpisodeNameSrc_currentIndexChanged(const int &index);
 	void on_comboEpisodeNameLang_currentIndexChanged(const int &index);
 	void on_editYear_textChanged(const QString &arg1);
@@ -101,6 +102,8 @@ private:
 
 	QString zerofy(QString string, int digits);
 	std::pair<int, int> searchSeasonAndEpisode(QString filename_qs);
+	int searchEpisode(QString filename_qs);
+	int searchEpisode_startIdx;
 
 	bool onlineDbAvailable();
 
@@ -139,6 +142,7 @@ private:
 	int input_vid_sDigits = 2;
 	QString input_vid_ePrefix = "e";
 	int input_vid_eDigits = 2;
+	bool input_vid_noSeason = false;
 	MetaDB input_vid_eNameSrc;
 	QString input_vid_eNameLang = "en";
 	QString input_vid_releaseYear;

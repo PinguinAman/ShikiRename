@@ -56,6 +56,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	QString tt_SNUMB = "Season numbers";
 	QString tt_EPREF = "Prefix for episode numbers";
 	QString tt_ENUMB = "Prefix for season numbers";
+	QString tt_GEPNR = "Tries to find the episode number without a season number. Uses the first found number while ignoring repeating filename patterns.";
 	QString tt_ENAME = "Name of the episodes (provided by the selected source)";
 	QString tt_RYEAR = "Year the series (or season) started";
 	QString tt_SLANG = "Primary language of the release, possibly subtitle language if important (e.g. <i>German</i> or <i>Japanese Dubbed German Subbed</i> or <i>JAP-Dub GER-Sub</i>)";
@@ -87,14 +88,15 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->comboEpisodeNameSrc->setToolTip(tt_EPNSS);
 	ui->comboEpisodeNameLang->addItem("");
 	ui->comboEpisodeNameLang->setToolTip(tt_EPNLS);
-	ui->editSeriesNrPrefix->setValidator(WIN_INVALID_FN);
-	ui->editSeriesNrPrefix->setToolTip(tt_SPREF);
-	ui->editSeriesNrDigits->setValidator(new QIntValidator(1, MAX_INT, this));
-	ui->editSeriesNrDigits->setToolTip(tt_SNUMB);
+	ui->editSeasonNrPrefix->setValidator(WIN_INVALID_FN);
+	ui->editSeasonNrPrefix->setToolTip(tt_SPREF);
+	ui->editSeasonNrDigits->setValidator(new QIntValidator(1, MAX_INT, this));
+	ui->editSeasonNrDigits->setToolTip(tt_SNUMB);
 	ui->editEpisodeNrPrefix->setValidator(WIN_INVALID_FN);
 	ui->editEpisodeNrPrefix->setToolTip(tt_EPREF);
 	ui->editEpisodeNrDigits->setValidator(new QIntValidator(1, MAX_INT, this));
 	ui->editEpisodeNrDigits->setToolTip(tt_ENUMB);
+	ui->checkboxNoSeason->setToolTip(tt_GEPNR);
 	ui->editYear->setValidator(WIN_INVALID_FN);
 	ui->editYear->setToolTip(tt_RYEAR);
 	ui->editLang->setValidator(WIN_INVALID_FN);
@@ -291,20 +293,20 @@ void ShikiRename::on_editName_textChanged(const QString &arg1)
 		this->previewRename();
 	}
 }
-void ShikiRename::on_editSeriesNrPrefix_textChanged(const QString &arg1)
+void ShikiRename::on_editSeasonNrPrefix_textChanged(const QString &arg1)
 {
 	if (!arg1.isEmpty()) {
 		input_vid_sPrefix = arg1;
 	}
 	else {
-		input_vid_sPrefix = ui->editSeriesNrPrefix->placeholderText();
+		input_vid_sPrefix = ui->editSeasonNrPrefix->placeholderText();
 	}
 	this->previewRename();
 }
-void ShikiRename::on_editSeriesNrDigits_textChanged(const QString &arg1)
+void ShikiRename::on_editSeasonNrDigits_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_vid_sDigits = ui->editSeriesNrDigits->placeholderText().toInt();
+		input_vid_sDigits = ui->editSeasonNrDigits->placeholderText().toInt();
 	else
 		input_vid_sDigits = arg1.toInt();
 	this->previewRename();
@@ -325,6 +327,10 @@ void ShikiRename::on_editEpisodeNrDigits_textChanged(const QString &arg1)
 		input_vid_eDigits = ui->editEpisodeNrDigits->placeholderText().toInt();
 	else
 		input_vid_eDigits = arg1.toInt();
+	this->previewRename();
+}
+void ShikiRename::on_checkboxNoSeason_toggled(const bool &checked) {
+	input_vid_noSeason = checked;
 	this->previewRename();
 }
 void ShikiRename::on_comboEpisodeNameSrc_currentIndexChanged(const int &index)
@@ -403,6 +409,7 @@ void ShikiRename::on_currentList_itemSelectionChanged()
 		selectedFilenames.append(item->text());
 	}
 	if (input_onlySelected) {
+		searchEpisode_startIdx = -1;
 		this->previewRename();
 	}
 }
@@ -416,6 +423,7 @@ void ShikiRename::open(QDir dir) {
 
 	ui->renamePreview->clear();
 	ui->currentList->clear();
+	searchEpisode_startIdx = -1;
 
 	for (int i = 0; i < infoList.count(); i++) {
 		QString fn = infoList.at(i).fileName();
@@ -491,14 +499,16 @@ void ShikiRename::addToHistory(int id, QString o, QString n) {
 	hist_undo.push_back(std::make_tuple(id, o, n));
 }
 void ShikiRename::previewRename() {
-	QStringList previewFilenames;
 	QMutableListIterator<QFileInfo> it(infoList);
 	int cur_num = input_num_init;							//keeps track of the consecutive numeration
+	ui->renamePreview->clear();
 
 	while (it.hasNext())									//iterates through every file
 	{
+		bool selected = false;
 		QString v = it.next().completeBaseName();			//v = original filename without file extension
 		if (isSelectedInList(it.value().fileName())) {		//if enabled, checks if the file has been selected.
+			selected = true;
 			if (ui->tabWidget->currentIndex() == 0) {
 				//Remove left
 				if (input_remLeft > 0)
@@ -547,6 +557,15 @@ void ShikiRename::previewRename() {
 			else if (ui->tabWidget->currentIndex() == 1) {
 				QRegExp rgx_invalidFnCharset_win = QRegExp(QString("[") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
 				std::pair<int, int> s_e = this->searchSeasonAndEpisode(v);
+				int season = s_e.first;
+				int ep;
+				if (!input_vid_noSeason) {
+					ep = s_e.second;
+				}
+				else {
+					ep = this->searchEpisode(v);
+				}
+
 				QString episodeName;
 				if (!episodeData.empty() && !episodeData.first().toObject().value("episodeName").isUndefined()) {
 					for (auto item : episodeData) {
@@ -562,9 +581,9 @@ void ShikiRename::previewRename() {
 				v = input_vid_customFileNameRaw;
 				v.replace(QString("<NAME>"), input_vid_name)
 					.replace(QString("<SEASON PREFIX>"), input_vid_sPrefix)
-					.replace(QString("<SEASON>"), this->zerofy(QString::number(s_e.first), input_vid_sDigits))
+					.replace(QString("<SEASON>"), this->zerofy(QString::number(season), input_vid_sDigits))
 					.replace(QString("<EPISODE PREFIX>"), input_vid_ePrefix)
-					.replace(QString("<EPISODE>"), this->zerofy(QString::number(s_e.second), input_vid_eDigits))
+					.replace(QString("<EPISODE>"), this->zerofy(QString::number(ep), input_vid_eDigits))
 					.replace(QString("<EPISODE NAME>"), episodeName)
 					.replace(QString("<YEAR>"), input_vid_releaseYear)
 					.replace(QString("<LANGUAGE>"), input_vid_language)
@@ -576,11 +595,15 @@ void ShikiRename::previewRename() {
 				v.remove(rgx_invalidFnCharset_win);
 			}
 		}
-		previewFilenames.append(v % QChar('.') % it.value().suffix());
+		QString fullFilename = v % QChar('.') % it.value().suffix();
+		QListWidgetItem* qListWidgetItem = new QListWidgetItem(fullFilename);
+		qListWidgetItem->setFlags(Qt::ItemNeverHasChildren);
+		if (selected) {
+			qListWidgetItem->setTextColor(Qt::black);
+		}
+		ui->renamePreview->addItem(qListWidgetItem);
 	}
 
-	ui->renamePreview->clear();
-	ui->renamePreview->insertItems(0, previewFilenames);
 	ui->buttonRename->setEnabled(ui->renamePreview->count() > 0);
 }
 void ShikiRename::on_buttonRename_clicked()
@@ -677,6 +700,68 @@ std::pair<int, int> ShikiRename::searchSeasonAndEpisode(QString filename_qs) {
 	}
 	return result;
 }
+int ShikiRename::searchEpisode(QString filename_qs) {
+	//todo only selected
+	if (searchEpisode_startIdx < 0) {
+		searchEpisode_startIdx = -1;
+		QVector<QString> fileNames;
+		for (auto item : infoList) {
+			if (item.fileName().isEmpty()) {	//shouldn't happen
+				fileNames.clear();
+				break;
+			}
+			fileNames.append(item.fileName());
+		}
+		if (!fileNames.isEmpty()) {
+			for (int i = 0; i < fileNames.count() - 1; i++) {
+				QString s1 = fileNames.at(i);
+				if (isSelectedInList(s1)) {	//current idx must be in selection
+					QString s2 = fileNames.at(i + 1);
+					int j = i + 2;
+					qDebug() << "Checking s2: " % s2;
+					for (; !isSelectedInList(s2) && j < fileNames.count();j++) {	//next idx must be in selection
+						qDebug() << "s2 (" % s2 % ") is not in selection!";
+						s2 = fileNames.at(j);
+						qDebug() << "Checking s2: " % s2;
+					}
+					if (!isSelectedInList(s2)) {
+						qDebug() << "No more selected items for s2!";
+						i = j;
+						break;
+					}
+					qDebug() << "s2 (" % s2 % ") is in selection!";
+					qDebug() << "Comparing s1 (" % s1 % ") to s2 (" % s2 % ").";
+					for (int k = 0; k < s1.length() && (searchEpisode_startIdx == -1 || k < searchEpisode_startIdx); k++) {
+						qDebug() << "Comparing \"" % s1.at(k) % "\" to \"" % s2.at(k) % "\"";
+						if (s1.at(k) != s2.at(k)) {
+							if (searchEpisode_startIdx != k) {
+								qDebug() << "Setting searchEpisode_startIdx to " % QString::number(k);
+								searchEpisode_startIdx = k;
+							}
+							break;
+						}
+					}
+					i = j - 2;
+				}
+				else {
+					qDebug() << "s1 (" % s1 % ") is not in selection!";
+				}
+			}
+		}
+		qDebug() << "Using searchEpisode_startIdx: " % QString::number(searchEpisode_startIdx);
+	}
+	
+	std::string string = filename_qs.mid(searchEpisode_startIdx).toStdString();
+	std::regex rgx(R"([\D0]*(\d+)[\s\S]*)");
+	std::smatch match;
+	int result = -1;
+	if (std::regex_search(string, match, rgx)) {
+		result = std::stoi(match.str(1));
+	}
+
+	qDebug() << "searchEpisode result for " % filename_qs % " is: " % QString::number(result);
+	return result;
+}
 
 void ShikiRename::openDialogSeriesSelection(QJsonArray seriesData) {
 	seriesSelectionDialog->setData(seriesData);
@@ -744,7 +829,16 @@ void ShikiRename::handleNetworkReply(QNetworkReply* reply) {
 	}
 	else if (replyType == "episodes") {
 		QJsonArray data = json.value("data").toArray();
-		if (episodeData.empty()) {
+		int seasonId = -1;
+		int page = -1;
+		std::regex rgx_seasonId_page(R"(series\/(\d+)\/episodes\/query\?page\=(\d+))");
+		std::smatch match_seasonId_page;
+
+		if (std::regex_search(requestUrl, match_seasonId_page, rgx_seasonId_page)) {
+			seasonId = std::stoi(match_seasonId_page.str(1));
+			page = std::stoi(match_seasonId_page.str(2));
+		}
+		if (episodeData.empty() || page == 1) {
 			episodeData = data;
 		}
 		else {
@@ -753,14 +847,9 @@ void ShikiRename::handleNetworkReply(QNetworkReply* reply) {
 			}
 		}
 		if (episodeData.count() % 100 == 0) {
-			std::regex rgx_seasonId_page(R"(series\/(\d+)\/episodes\/query\?page\=(\d+))");
-			std::smatch match_seasonId_page;
 
-			if (std::regex_search(requestUrl, match_seasonId_page, rgx_seasonId_page)) {
-				int seasonId = std::stoi(match_seasonId_page.str(1));
-				int page = std::stoi(match_seasonId_page.str(2)) + 1;
-				this->tvdbFindEpisodes(seasonId, page);
-			}
+				this->tvdbFindEpisodes(seasonId, page+1);
+			
 		}
 		else {
 			previewRename();

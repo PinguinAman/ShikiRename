@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1533</width>
+    <width>1387</width>
     <height>887</height>
    </rect>
   </property>
@@ -69,7 +69,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_1">
          <attribute name="title">
@@ -337,7 +337,7 @@
             <number>10</number>
            </property>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="editSeriesNrPrefix">
+            <widget class="QLineEdit" name="editSeasonNrPrefix">
              <property name="text">
               <string/>
              </property>
@@ -474,16 +474,16 @@
             </widget>
            </item>
            <item row="2" column="2">
-            <widget class="QLabel" name="labelSeriesNrDigits">
+            <widget class="QLabel" name="labelSeasonNrDigits">
              <property name="text">
               <string>Digits</string>
              </property>
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="labelSeriesNrPrefix">
+            <widget class="QLabel" name="labelSeasonNrPrefix">
              <property name="text">
-              <string>Prefix Series Number</string>
+              <string>Prefix Season Number</string>
              </property>
             </widget>
            </item>
@@ -494,28 +494,8 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="3" colspan="2">
-            <widget class="QLineEdit" name="editSeriesNrDigits">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="placeholderText">
-              <string>2</string>
-             </property>
-            </widget>
-           </item>
            <item row="6" column="3" colspan="2">
             <widget class="QLineEdit" name="editLang"/>
-           </item>
-           <item row="3" column="3" colspan="2">
-            <widget class="QLineEdit" name="editEpisodeNrDigits">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="placeholderText">
-              <string>2</string>
-             </property>
-            </widget>
            </item>
            <item row="7" column="3" colspan="2">
             <widget class="QLineEdit" name="editResolution"/>
@@ -539,6 +519,33 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="3">
+            <widget class="QLineEdit" name="editSeasonNrDigits">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>2</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="3">
+            <widget class="QLineEdit" name="editEpisodeNrDigits">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>2</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="4" rowspan="2">
+            <widget class="QCheckBox" name="checkboxNoSeason">
+             <property name="text">
+              <string>No season numbers</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -553,7 +560,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1533</width>
+     <width>1387</width>
      <height>21</height>
     </rect>
    </property>
@@ -619,8 +626,8 @@
   <tabstop>editNumInc</tabstop>
   <tabstop>editNumDigits</tabstop>
   <tabstop>editName</tabstop>
-  <tabstop>editSeriesNrPrefix</tabstop>
-  <tabstop>editSeriesNrDigits</tabstop>
+  <tabstop>editSeasonNrPrefix</tabstop>
+  <tabstop>editSeasonNrDigits</tabstop>
   <tabstop>editEpisodeNrPrefix</tabstop>
   <tabstop>editEpisodeNrDigits</tabstop>
   <tabstop>comboEpisodeNameSrc</tabstop>
