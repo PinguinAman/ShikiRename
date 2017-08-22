@@ -24,6 +24,11 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->setupUi(this);
 	ui->tab_2_gridLayout->setGeometry(ui->tab_2->geometry());
 
+	QIcon iconOpen = QIcon();
+	ui->buttonOpen->setIcon(QIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon)));
+	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
+	ui->editDirectory->setPlaceholderText("<directory>");
+
 	//Filename lists
 	ui->currentList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	ui->renamePreview->setSelectionMode(QAbstractItemView::NoSelection);
@@ -160,6 +165,10 @@ void ShikiRename::fixGridLayoutWidth() {
 	QRect newSize2 = ui->tab_2->geometry();
 	newSize2.setHeight(ui->gridLayoutWidget->height());
 	ui->gridLayoutWidget->setGeometry(newSize2);
+}
+void ShikiRename::on_editDirectory_returnPressed()
+{
+	this->open(QDir::fromNativeSeparators(ui->editDirectory->text()));
 }
 
 void ShikiRename::on_editRemoveLeft_textChanged(const QString &arg1)
@@ -418,9 +427,12 @@ bool ShikiRename::isSelectedInList(QString filename) {
 }
 
 void ShikiRename::open(QDir dir) {
+	if (!dir.exists()) {
+		return;				//TODO maybe, do stuff?
+	}
 	dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
 	infoList = dir.entryInfoList();
-
+	ui->editDirectory->setText(QDir::toNativeSeparators(dir.absolutePath()));
 	ui->renamePreview->clear();
 	ui->currentList->clear();
 	searchEpisode_startIdx = -1;

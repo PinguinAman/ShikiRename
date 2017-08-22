@@ -29,6 +29,7 @@ public:
 
 	private slots:
 	void on_tabWidget_currentChanged(const int &index);
+	void on_editDirectory_returnPressed();
 
 	void on_editRemoveRight_textChanged(const QString &arg1);
 	void on_editRemoveLeft_textChanged(const QString &arg1);

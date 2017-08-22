@@ -28,7 +28,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QToolBar>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -41,10 +40,13 @@ public:
     QAction *actionUndo;
     QAction *actionRedo;
     QWidget *centralWidget;
-    QGridLayout *gridLayout_2;
+    QGridLayout *gLayout_centralWidget;
     QPushButton *buttonRename;
-    QVBoxLayout *verticalLayout;
-    QHBoxLayout *horizontalLayout_2;
+    QVBoxLayout *vLayout_Main;
+    QHBoxLayout *hLayout_Directory;
+    QPushButton *buttonOpen;
+    QLineEdit *editDirectory;
+    QHBoxLayout *hLayout_Lists;
     QListWidget *currentList;
     QListWidget *renamePreview;
     QCheckBox *checkboxOnlySelected;
@@ -123,7 +125,6 @@ public:
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
-    QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *ShikiRenameClass)
@@ -141,48 +142,73 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         centralWidget->setMaximumSize(QSize(16777215, 16777215));
         centralWidget->setToolTipDuration(-1);
-        gridLayout_2 = new QGridLayout(centralWidget);
-        gridLayout_2->setSpacing(6);
-        gridLayout_2->setContentsMargins(11, 11, 11, 11);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        gLayout_centralWidget = new QGridLayout(centralWidget);
+        gLayout_centralWidget->setSpacing(6);
+        gLayout_centralWidget->setContentsMargins(11, 11, 11, 11);
+        gLayout_centralWidget->setObjectName(QStringLiteral("gLayout_centralWidget"));
+        gLayout_centralWidget->setContentsMargins(8, 8, 8, 8);
         buttonRename = new QPushButton(centralWidget);
         buttonRename->setObjectName(QStringLiteral("buttonRename"));
 
-        gridLayout_2->addWidget(buttonRename, 1, 1, 1, 1);
+        gLayout_centralWidget->addWidget(buttonRename, 2, 3, 1, 1);
 
-        verticalLayout = new QVBoxLayout();
-        verticalLayout->setSpacing(6);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        vLayout_Main = new QVBoxLayout();
+        vLayout_Main->setSpacing(6);
+        vLayout_Main->setObjectName(QStringLiteral("vLayout_Main"));
+        vLayout_Main->setSizeConstraint(QLayout::SetDefaultConstraint);
+        vLayout_Main->setContentsMargins(0, -1, -1, -1);
+        hLayout_Directory = new QHBoxLayout();
+        hLayout_Directory->setSpacing(6);
+        hLayout_Directory->setObjectName(QStringLiteral("hLayout_Directory"));
+        buttonOpen = new QPushButton(centralWidget);
+        buttonOpen->setObjectName(QStringLiteral("buttonOpen"));
+        QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(buttonOpen->sizePolicy().hasHeightForWidth());
+        buttonOpen->setSizePolicy(sizePolicy);
+        buttonOpen->setMinimumSize(QSize(24, 24));
+        buttonOpen->setMaximumSize(QSize(24, 24));
+
+        hLayout_Directory->addWidget(buttonOpen);
+
+        editDirectory = new QLineEdit(centralWidget);
+        editDirectory->setObjectName(QStringLiteral("editDirectory"));
+
+        hLayout_Directory->addWidget(editDirectory);
+
+
+        vLayout_Main->addLayout(hLayout_Directory);
+
+        hLayout_Lists = new QHBoxLayout();
+        hLayout_Lists->setSpacing(6);
+        hLayout_Lists->setObjectName(QStringLiteral("hLayout_Lists"));
         currentList = new QListWidget(centralWidget);
         currentList->setObjectName(QStringLiteral("currentList"));
         currentList->setMaximumSize(QSize(16777215, 16777215));
 
-        horizontalLayout_2->addWidget(currentList);
+        hLayout_Lists->addWidget(currentList);
 
         renamePreview = new QListWidget(centralWidget);
         renamePreview->setObjectName(QStringLiteral("renamePreview"));
 
-        horizontalLayout_2->addWidget(renamePreview);
+        hLayout_Lists->addWidget(renamePreview);
 
 
-        verticalLayout->addLayout(horizontalLayout_2);
+        vLayout_Main->addLayout(hLayout_Lists);
 
         checkboxOnlySelected = new QCheckBox(centralWidget);
         checkboxOnlySelected->setObjectName(QStringLiteral("checkboxOnlySelected"));
 
-        verticalLayout->addWidget(checkboxOnlySelected);
+        vLayout_Main->addWidget(checkboxOnlySelected);
 
         tabWidget = new QTabWidget(centralWidget);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        sizePolicy.setHorizontalStretch(0);
-        sizePolicy.setVerticalStretch(0);
-        sizePolicy.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
-        tabWidget->setSizePolicy(sizePolicy);
+        QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        sizePolicy1.setHorizontalStretch(0);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
+        tabWidget->setSizePolicy(sizePolicy1);
         tab_1 = new QWidget();
         tab_1->setObjectName(QStringLiteral("tab_1"));
         layoutWidget = new QWidget(tab_1);
@@ -539,12 +565,12 @@ public:
         tab_2_gridLayout->setColumnStretch(3, 25);
         tabWidget->addTab(tab_2, QString());
 
-        verticalLayout->addWidget(tabWidget);
+        vLayout_Main->addWidget(tabWidget);
 
-        verticalLayout->setStretch(0, 100);
-        verticalLayout->setStretch(2, 70);
+        vLayout_Main->setStretch(1, 100);
+        vLayout_Main->setStretch(3, 70);
 
-        gridLayout_2->addLayout(verticalLayout, 0, 0, 1, 2);
+        gLayout_centralWidget->addLayout(vLayout_Main, 1, 2, 1, 2);
 
         ShikiRenameClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(ShikiRenameClass);
@@ -555,9 +581,6 @@ public:
         menuEdit = new QMenu(menuBar);
         menuEdit->setObjectName(QStringLiteral("menuEdit"));
         ShikiRenameClass->setMenuBar(menuBar);
-        mainToolBar = new QToolBar(ShikiRenameClass);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
-        ShikiRenameClass->addToolBar(Qt::TopToolBarArea, mainToolBar);
         statusBar = new QStatusBar(ShikiRenameClass);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         ShikiRenameClass->setStatusBar(statusBar);
@@ -609,6 +632,7 @@ public:
         actionUndo->setText(QApplication::translate("ShikiRenameClass", "Undo", Q_NULLPTR));
         actionRedo->setText(QApplication::translate("ShikiRenameClass", "Redo", Q_NULLPTR));
         buttonRename->setText(QApplication::translate("ShikiRenameClass", "Rename", Q_NULLPTR));
+        buttonOpen->setText(QString());
         checkboxOnlySelected->setText(QApplication::translate("ShikiRenameClass", "Rename only selected entries", Q_NULLPTR));
         labelRemoveLeft2->setText(QApplication::translate("ShikiRenameClass", "characters", Q_NULLPTR));
         labelRemoveRight2->setText(QApplication::translate("ShikiRenameClass", "characters", Q_NULLPTR));
