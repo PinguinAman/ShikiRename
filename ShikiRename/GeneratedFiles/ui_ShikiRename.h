@@ -39,6 +39,8 @@ public:
     QAction *actionOpen;
     QAction *actionUndo;
     QAction *actionRedo;
+    QAction *actionQuit;
+    QAction *actionRefresh;
     QWidget *centralWidget;
     QGridLayout *gLayout_centralWidget;
     QPushButton *buttonRename;
@@ -138,6 +140,10 @@ public:
         actionUndo->setObjectName(QStringLiteral("actionUndo"));
         actionRedo = new QAction(ShikiRenameClass);
         actionRedo->setObjectName(QStringLiteral("actionRedo"));
+        actionQuit = new QAction(ShikiRenameClass);
+        actionQuit->setObjectName(QStringLiteral("actionQuit"));
+        actionRefresh = new QAction(ShikiRenameClass);
+        actionRefresh->setObjectName(QStringLiteral("actionRefresh"));
         centralWidget = new QWidget(ShikiRenameClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         centralWidget->setMaximumSize(QSize(16777215, 16777215));
@@ -614,6 +620,8 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
         menuFile->addAction(actionOpen);
+        menuFile->addAction(actionRefresh);
+        menuFile->addAction(actionQuit);
         menuEdit->addAction(actionUndo);
         menuEdit->addAction(actionRedo);
 
@@ -631,6 +639,8 @@ public:
         actionOpen->setText(QApplication::translate("ShikiRenameClass", "Open Directory ...", Q_NULLPTR));
         actionUndo->setText(QApplication::translate("ShikiRenameClass", "Undo", Q_NULLPTR));
         actionRedo->setText(QApplication::translate("ShikiRenameClass", "Redo", Q_NULLPTR));
+        actionQuit->setText(QApplication::translate("ShikiRenameClass", "Quit", Q_NULLPTR));
+        actionRefresh->setText(QApplication::translate("ShikiRenameClass", "Refresh", Q_NULLPTR));
         buttonRename->setText(QApplication::translate("ShikiRenameClass", "Rename", Q_NULLPTR));
         buttonOpen->setText(QString());
         checkboxOnlySelected->setText(QApplication::translate("ShikiRenameClass", "Rename only selected entries", Q_NULLPTR));

@@ -122,6 +122,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->actionRedo->setEnabled(false);
 	ui->actionUndo->setShortcut(tr("CTRL+Z"));
 	ui->actionRedo->setShortcut(tr("CTRL+Y"));
+	ui->actionRefresh->setDisabled(true);
 
 	ui->buttonRename->setDisabled(true);
 
@@ -430,9 +431,12 @@ void ShikiRename::open(QDir dir) {
 	if (!dir.exists()) {
 		return;				//TODO maybe, do stuff?
 	}
+	curDir = dir.absolutePath();
+	ui->actionRefresh->setEnabled(true);
+	ui->editDirectory->setText(QDir::toNativeSeparators(curDir));
+
 	dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
 	infoList = dir.entryInfoList();
-	ui->editDirectory->setText(QDir::toNativeSeparators(dir.absolutePath()));
 	ui->renamePreview->clear();
 	ui->currentList->clear();
 	searchEpisode_startIdx = -1;
@@ -444,16 +448,21 @@ void ShikiRename::open(QDir dir) {
 	}
 	previewRename();
 }
-void ShikiRename::on_actionOpen_triggered()
-{
+void ShikiRename::on_actionOpen_triggered() {
 	QDir dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), "/home", QFileDialog::ShowDirsOnly);
 
 	if (dir.path() != ".") {
 		this->open(dir);
 	}
 	else {
-		qDebug() << "Current directory selected, assuming dialog has been canceled.";
+		qDebug() << "Current working directory selected, assuming dialog has been canceled.";
 	}
+}
+void ShikiRename::on_actionRefresh_triggered() {
+	this->open(curDir);
+}
+void ShikiRename::on_actionQuit_triggered() {
+	QCoreApplication::quit();
 }
 void ShikiRename::on_actionUndo_triggered()
 {

@@ -69,6 +69,8 @@ public:
 	void on_currentList_itemSelectionChanged();
 
 	void on_actionOpen_triggered();
+	void on_actionRefresh_triggered();
+	void on_actionQuit_triggered();
 	void on_actionUndo_triggered();
 	void on_actionRedo_triggered();
 
@@ -113,6 +115,7 @@ private:
 	void tvdbFindEpisodes(int seriesId, int page);
 	void tvdbGetLanguages();
 
+	QString curDir;
 	QFileInfoList infoList;
 	QStringList filenames;
 	QStringList fileextensions;
