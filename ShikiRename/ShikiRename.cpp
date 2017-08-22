@@ -700,11 +700,11 @@ std::pair<int, int> ShikiRename::searchSeasonAndEpisode(QString filename_qs) {
 	}
 	return result;
 }
-int ShikiRename::searchEpisode(QString filename_qs) {
-	//todo only selected
+int ShikiRename::searchEpisode(QString filename) {
 	if (searchEpisode_startIdx < 0) {
 		searchEpisode_startIdx = -1;
 		QVector<QString> fileNames;
+
 		for (auto item : infoList) {
 			if (item.fileName().isEmpty()) {	//shouldn't happen
 				fileNames.clear();
@@ -715,31 +715,29 @@ int ShikiRename::searchEpisode(QString filename_qs) {
 		if (!fileNames.isEmpty()) {
 			for (int i = 0; i < fileNames.count() - 1; i++) {
 				QString s1 = fileNames.at(i);
-				if (isSelectedInList(s1)) {	//current idx must be in selection
+				if (isSelectedInList(s1)) {											//current idx must be in selection
 					QString s2 = fileNames.at(i + 1);
 					int j = i + 2;
-					for (; !isSelectedInList(s2) && j < fileNames.count();j++) {	//next idx must be in selection
+					for (; !isSelectedInList(s2) && j < fileNames.count();j++) {	//next idx must be in selection as well
+						i = j-1;													//next s1 shall be current s2, so move our s1 idx in front of our s2 idx so the next loop increments to s2 idx
 						s2 = fileNames.at(j);
 					}
-					if (!isSelectedInList(s2)) {
-						i = j;
+					if (!isSelectedInList(s2)) {									//last item reached & is not in selection
 						break;
 					}
-					for (int k = 0; k < s1.length() && (searchEpisode_startIdx == -1 || k < searchEpisode_startIdx); k++) {
-						if (s1.at(k) != s2.at(k)) {
-							if (searchEpisode_startIdx != k) {
-								searchEpisode_startIdx = k;
-							}
+					//compare strings until a difference is found or until we've reached a previously determined index of a difference
+					for (int k = 0; k < s1.length() && (searchEpisode_startIdx == -1 || k < searchEpisode_startIdx); k++) {  
+						if (s1.at(k) != s2.at(k)) {									
+							searchEpisode_startIdx = k;
 							break;
 						}
 					}
-					i = j - 2;
 				}
 			}
 		}
 	}
 	
-	std::string string = filename_qs.mid(searchEpisode_startIdx).toStdString();
+	std::string string = filename.mid(searchEpisode_startIdx).toStdString();
 	std::regex rgx(R"([\D0]*(\d+)[\s\S]*)");
 	std::smatch match;
 	int result = -1;
