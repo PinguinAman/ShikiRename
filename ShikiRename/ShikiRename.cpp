@@ -718,24 +718,16 @@ int ShikiRename::searchEpisode(QString filename_qs) {
 				if (isSelectedInList(s1)) {	//current idx must be in selection
 					QString s2 = fileNames.at(i + 1);
 					int j = i + 2;
-					qDebug() << "Checking s2: " % s2;
 					for (; !isSelectedInList(s2) && j < fileNames.count();j++) {	//next idx must be in selection
-						qDebug() << "s2 (" % s2 % ") is not in selection!";
 						s2 = fileNames.at(j);
-						qDebug() << "Checking s2: " % s2;
 					}
 					if (!isSelectedInList(s2)) {
-						qDebug() << "No more selected items for s2!";
 						i = j;
 						break;
 					}
-					qDebug() << "s2 (" % s2 % ") is in selection!";
-					qDebug() << "Comparing s1 (" % s1 % ") to s2 (" % s2 % ").";
 					for (int k = 0; k < s1.length() && (searchEpisode_startIdx == -1 || k < searchEpisode_startIdx); k++) {
-						qDebug() << "Comparing \"" % s1.at(k) % "\" to \"" % s2.at(k) % "\"";
 						if (s1.at(k) != s2.at(k)) {
 							if (searchEpisode_startIdx != k) {
-								qDebug() << "Setting searchEpisode_startIdx to " % QString::number(k);
 								searchEpisode_startIdx = k;
 							}
 							break;
@@ -743,12 +735,8 @@ int ShikiRename::searchEpisode(QString filename_qs) {
 					}
 					i = j - 2;
 				}
-				else {
-					qDebug() << "s1 (" % s1 % ") is not in selection!";
-				}
 			}
 		}
-		qDebug() << "Using searchEpisode_startIdx: " % QString::number(searchEpisode_startIdx);
 	}
 	
 	std::string string = filename_qs.mid(searchEpisode_startIdx).toStdString();
@@ -758,8 +746,6 @@ int ShikiRename::searchEpisode(QString filename_qs) {
 	if (std::regex_search(string, match, rgx)) {
 		result = std::stoi(match.str(1));
 	}
-
-	qDebug() << "searchEpisode result for " % filename_qs % " is: " % QString::number(result);
 	return result;
 }
 
