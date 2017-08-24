@@ -88,7 +88,7 @@ private:
 	SeriesSelectionDialog *seriesSelectionDialog;
 	RenameConfirmationDialog *renameConfirmationDialog;
 
-	const QString DEFAULT_MEDIA_FILENAME_STRUCTURE = "<NAME> - <SEASON PREFIX><SEASON><EPISODE PREFIX><EPISODE> - <EPISODE NAME> - [<YEAR> <LANGUAGE> <AUDIO> <RESOLUTION> <SOURCE> <VIDEO> - <SCENE GROUP>]";
+	const QString DEFAULT_MEDIA_FILENAME_STRUCTURE = "<NAME> - <SEASON PREFIX><SEASON><EPISODE PREFIX><EPISODE> - [<EPISODE ABSOLUTE>] <EPISODE NAME> - [<YEAR> <LANGUAGE> <AUDIO> <RESOLUTION> <SOURCE> <VIDEO> - <SCENE GROUP>]";
 	const enum MetaDB { None = 0, TheTVDB = 1 };
 	const int TVDB_TIMEOUT = 20000;	//ms
 	QString invalidFnCharset_win;
@@ -115,7 +115,7 @@ private:
 	void tvdbFindEpisodes(int seriesId, int page);
 	void tvdbGetLanguages();
 
-	QString curDir;
+	QString curDir = "";
 	QFileInfoList infoList;
 	QStringList filenames;
 	QStringList fileextensions;

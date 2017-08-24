@@ -24,7 +24,6 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->setupUi(this);
 	ui->tab_2_gridLayout->setGeometry(ui->tab_2->geometry());
 
-	QIcon iconOpen = QIcon();
 	ui->buttonOpen->setIcon(QIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon)));
 	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
 	ui->editDirectory->setPlaceholderText("<directory>");
@@ -60,7 +59,8 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	QString tt_SPREF = "Prefix for season numbers";
 	QString tt_SNUMB = "Season numbers";
 	QString tt_EPREF = "Prefix for episode numbers";
-	QString tt_ENUMB = "Prefix for season numbers";
+	QString tt_ENUMB = "Episode numbers";
+	QString tt_ENABS = "Absolute episode numbers (Total episodes, not divided into seasons)";
 	QString tt_GEPNR = "Tries to find the episode number without a season number. Uses the first found number while ignoring repeating filename patterns.";
 	QString tt_ENAME = "Name of the episodes (provided by the selected source)";
 	QString tt_RYEAR = "Year the series (or season) started";
@@ -70,12 +70,13 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	QString tt_SOURC = "Primary source of the release (usually refers to video source) (e.g. <i>BluRay</i> or <i>HDDVD</i>)";
 	QString tt_VIDEO = "Used video codec (e.g. <i>x264</i> or <i>XViD</i>)";
 	QString tt_GROUP = "The scene group providing this release (obviously refers to pirated copies)";
-	QString tt_CNAME = QString("<p>Available tags:</p>")
+	QString tt_CNAME = QString("Schema of the target file names. Default is setup to work with Plex. <p>Available tags:</p>")
 		% QString("<b>&lt;NAME&gt;</b> - ") % tt_SNAME
 		% QString("<br><b>&lt;SEASON PREFIX&gt;</b> - ") % tt_SPREF
 		% QString("<br><b>&lt;SEASON&gt;</b> - ") % tt_SNUMB
 		% QString("<br><b>&lt;EPISODE PREFIX&gt;</b> - ") % tt_EPREF
 		% QString("<br><b>&lt;EPISODE&gt;</b> - ") % tt_ENUMB
+		% QString("<br><b>&lt;EPISODE ABSOLUTE&gt;</b> - ") % tt_ENABS
 		% QString("<br><b>&lt;EPISODE NAME&gt;</b> - ") % tt_ENAME
 		% QString("<br><b>&lt;YEAR&gt;</b> - ") % tt_RYEAR
 		% QString("<br><b>&lt;LANGUAGE&gt;</b> - ") % tt_SLANG
@@ -449,7 +450,11 @@ void ShikiRename::open(QDir dir) {
 	previewRename();
 }
 void ShikiRename::on_actionOpen_triggered() {
-	QDir dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), "/home", QFileDialog::ShowDirsOnly);
+	QString openDir = QDir::homePath();
+	if (!curDir.isEmpty()) {
+		openDir = curDir;
+	}
+	QDir dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), openDir, QFileDialog::ShowDirsOnly);
 
 	if (dir.path() != ".") {
 		this->open(dir);
@@ -588,12 +593,14 @@ void ShikiRename::previewRename() {
 				}
 
 				QString episodeName;
+				QString episodeAbsolute;
 				if (!episodeData.empty() && !episodeData.first().toObject().value("episodeName").isUndefined()) {
 					for (auto item : episodeData) {
 						QJsonObject jo = item.toObject();
 						if (jo.value("airedSeason").toInt() == s_e.first && jo.value("airedEpisodeNumber").toInt() == s_e.second) {
 							episodeName = jo.value("episodeName").toString();
 							episodeName.remove(rgx_invalidFnCharset_win);
+							episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
 							break;
 						}
 					}
@@ -605,6 +612,7 @@ void ShikiRename::previewRename() {
 					.replace(QString("<SEASON>"), this->zerofy(QString::number(season), input_vid_sDigits))
 					.replace(QString("<EPISODE PREFIX>"), input_vid_ePrefix)
 					.replace(QString("<EPISODE>"), this->zerofy(QString::number(ep), input_vid_eDigits))
+					.replace(QString("<EPISODE ABSOLUTE>"), this->zerofy(episodeAbsolute, input_vid_eDigits))
 					.replace(QString("<EPISODE NAME>"), episodeName)
 					.replace(QString("<YEAR>"), input_vid_releaseYear)
 					.replace(QString("<LANGUAGE>"), input_vid_language)
