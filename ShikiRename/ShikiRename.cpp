@@ -583,12 +583,14 @@ void ShikiRename::previewRename() {
 			else if (ui->tabWidget->currentIndex() == 1) {
 				QRegExp rgx_invalidFnCharset_win = QRegExp(QString("[") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
 				std::pair<int, int> s_e = this->searchSeasonAndEpisode(v);
-				int season = s_e.first;
+				int season;
 				int ep;
 				if (!input_vid_noSeason) {
+					season = s_e.first;
 					ep = s_e.second;
 				}
 				else {
+					season = 1;
 					ep = this->searchEpisode(v);
 				}
 
@@ -597,7 +599,7 @@ void ShikiRename::previewRename() {
 				if (!episodeData.empty() && !episodeData.first().toObject().value("episodeName").isUndefined()) {
 					for (auto item : episodeData) {
 						QJsonObject jo = item.toObject();
-						if (jo.value("airedSeason").toInt() == s_e.first && jo.value("airedEpisodeNumber").toInt() == s_e.second) {
+						if (jo.value("airedSeason").toInt() == season && jo.value("airedEpisodeNumber").toInt() == ep) {
 							episodeName = jo.value("episodeName").toString();
 							episodeName.remove(rgx_invalidFnCharset_win);
 							episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
