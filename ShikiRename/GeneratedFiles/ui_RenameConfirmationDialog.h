@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'RenameConfirmationDialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,11 +10,8 @@
 #define UI_RENAMECONFIRMATIONDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFormLayout>
-#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
@@ -34,7 +31,7 @@ public:
     void setupUi(QWidget *RenameConfirmationDialog)
     {
         if (RenameConfirmationDialog->objectName().isEmpty())
-            RenameConfirmationDialog->setObjectName(QStringLiteral("RenameConfirmationDialog"));
+            RenameConfirmationDialog->setObjectName(QString::fromUtf8("RenameConfirmationDialog"));
         RenameConfirmationDialog->resize(950, 419);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -42,9 +39,9 @@ public:
         sizePolicy.setHeightForWidth(RenameConfirmationDialog->sizePolicy().hasHeightForWidth());
         RenameConfirmationDialog->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(RenameConfirmationDialog);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         targetFilenameEditor = new QListWidget(RenameConfirmationDialog);
-        targetFilenameEditor->setObjectName(QStringLiteral("targetFilenameEditor"));
+        targetFilenameEditor->setObjectName(QString::fromUtf8("targetFilenameEditor"));
         targetFilenameEditor->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
         targetFilenameEditor->setTabKeyNavigation(true);
         targetFilenameEditor->setProperty("showDropIndicator", QVariant(false));
@@ -54,19 +51,19 @@ public:
         verticalLayout->addWidget(targetFilenameEditor);
 
         buttonLayout = new QFormLayout();
-        buttonLayout->setObjectName(QStringLiteral("buttonLayout"));
+        buttonLayout->setObjectName(QString::fromUtf8("buttonLayout"));
         buttonLayout->setLabelAlignment(Qt::AlignCenter);
         buttonLayout->setFormAlignment(Qt::AlignHCenter|Qt::AlignTop);
         buttonLayout->setHorizontalSpacing(10);
         buttonLayout->setContentsMargins(0, -1, 0, -1);
         buttonOK = new QPushButton(RenameConfirmationDialog);
-        buttonOK->setObjectName(QStringLiteral("buttonOK"));
+        buttonOK->setObjectName(QString::fromUtf8("buttonOK"));
         buttonOK->setMaximumSize(QSize(100, 23));
 
         buttonLayout->setWidget(0, QFormLayout::LabelRole, buttonOK);
 
         buttonCancel = new QPushButton(RenameConfirmationDialog);
-        buttonCancel->setObjectName(QStringLiteral("buttonCancel"));
+        buttonCancel->setObjectName(QString::fromUtf8("buttonCancel"));
         sizePolicy.setHeightForWidth(buttonCancel->sizePolicy().hasHeightForWidth());
         buttonCancel->setSizePolicy(sizePolicy);
         buttonCancel->setMaximumSize(QSize(100, 23));
@@ -84,9 +81,9 @@ public:
 
     void retranslateUi(QWidget *RenameConfirmationDialog)
     {
-        RenameConfirmationDialog->setWindowTitle(QApplication::translate("RenameConfirmationDialog", "Form", Q_NULLPTR));
-        buttonOK->setText(QApplication::translate("RenameConfirmationDialog", "OK", Q_NULLPTR));
-        buttonCancel->setText(QApplication::translate("RenameConfirmationDialog", "Cancel", Q_NULLPTR));
+        RenameConfirmationDialog->setWindowTitle(QApplication::translate("RenameConfirmationDialog", "Form", nullptr));
+        buttonOK->setText(QApplication::translate("RenameConfirmationDialog", "OK", nullptr));
+        buttonCancel->setText(QApplication::translate("RenameConfirmationDialog", "Cancel", nullptr));
     } // retranslateUi
 
 };

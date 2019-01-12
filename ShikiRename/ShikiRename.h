@@ -6,6 +6,7 @@
 #include <QStringBuilder>
 #include <QFileInfo>
 #include <limits>
+#include <QFutureWatcher>
 #include <QtNetwork/QNetworkReply>
 #include <SeriesSelectionDialog.h>
 #include <RenameConfirmationDialog.h>
@@ -13,6 +14,7 @@
 #include <QTableWidgetItem>
 #include <QJsonArray>
 #include <regex>
+#include "MediaInfoDLL/MediaInfoDLL.h" //Dynamicly-loaded library (.dll or .so)
 
 namespace Ui {
 	class ShikiRenameClass;
@@ -23,7 +25,7 @@ class ShikiRename : public QMainWindow
 	Q_OBJECT
 
 public:
-	const int MAX_INT = std::numeric_limits<int>::max();
+	const int MAX_INT = (std::numeric_limits<int>::max)();
 	explicit ShikiRename(QWidget *parent = 0);
 	~ShikiRename();
 
@@ -93,6 +95,9 @@ private:
 	const int TVDB_TIMEOUT = 20000;	//ms
 	QString invalidFnCharset_win;
 
+	MediaInfoDLL::MediaInfo MI;
+	QMap<QString, QMap<QString, QString>> mediaInfoCache;
+
 	void resizeEvent(QResizeEvent * event);
 	void changeEvent(QEvent * event);
 	void fixGridLayoutWidth();
@@ -102,8 +107,10 @@ private:
 	void open(QDir dir);
 	void addToHistory(int id, QString o, QString n);
 	void previewRename();
+	void cacheMediaInfo(QFileInfo fileInfo);
 
 	QString zerofy(QString string, int digits);
+
 	std::pair<int, int> searchSeasonAndEpisode(QString filename_qs);
 	int searchEpisode(QString filename_qs);
 	int searchEpisode_startIdx;
@@ -159,6 +166,7 @@ private:
 	QString releaseDataSuffix;
 	bool input_epDetection = false;
 	bool ongoingSeriesSelection = false;
+	//QFutureWatcher<void> mediaInfoCacheWatcher;
 	QNetworkAccessManager *manager;
 	QByteArray tvdbAuthToken;
 	QTimer *tvdbAuthTimer;

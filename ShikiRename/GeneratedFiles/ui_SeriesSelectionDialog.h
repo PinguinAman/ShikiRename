@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'SeriesSelectionDialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.9.1
+** Created by: Qt User Interface Compiler version 5.12.0
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,9 +10,7 @@
 #define UI_SERIESSELECTIONDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
@@ -34,7 +32,7 @@ public:
     void setupUi(QWidget *SeriesSelectionDialog)
     {
         if (SeriesSelectionDialog->objectName().isEmpty())
-            SeriesSelectionDialog->setObjectName(QStringLiteral("SeriesSelectionDialog"));
+            SeriesSelectionDialog->setObjectName(QString::fromUtf8("SeriesSelectionDialog"));
         SeriesSelectionDialog->resize(950, 419);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -42,26 +40,26 @@ public:
         sizePolicy.setHeightForWidth(SeriesSelectionDialog->sizePolicy().hasHeightForWidth());
         SeriesSelectionDialog->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(SeriesSelectionDialog);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         tableSeriesSelect = new QTableWidget(SeriesSelectionDialog);
-        tableSeriesSelect->setObjectName(QStringLiteral("tableSeriesSelect"));
+        tableSeriesSelect->setObjectName(QString::fromUtf8("tableSeriesSelect"));
 
         verticalLayout->addWidget(tableSeriesSelect);
 
         buttonLayout = new QFormLayout();
-        buttonLayout->setObjectName(QStringLiteral("buttonLayout"));
+        buttonLayout->setObjectName(QString::fromUtf8("buttonLayout"));
         buttonLayout->setLabelAlignment(Qt::AlignCenter);
         buttonLayout->setFormAlignment(Qt::AlignHCenter|Qt::AlignTop);
         buttonLayout->setHorizontalSpacing(10);
         buttonLayout->setContentsMargins(0, -1, 0, -1);
         buttonOK = new QPushButton(SeriesSelectionDialog);
-        buttonOK->setObjectName(QStringLiteral("buttonOK"));
+        buttonOK->setObjectName(QString::fromUtf8("buttonOK"));
         buttonOK->setMaximumSize(QSize(100, 23));
 
         buttonLayout->setWidget(0, QFormLayout::LabelRole, buttonOK);
 
         buttonCancel = new QPushButton(SeriesSelectionDialog);
-        buttonCancel->setObjectName(QStringLiteral("buttonCancel"));
+        buttonCancel->setObjectName(QString::fromUtf8("buttonCancel"));
         sizePolicy.setHeightForWidth(buttonCancel->sizePolicy().hasHeightForWidth());
         buttonCancel->setSizePolicy(sizePolicy);
         buttonCancel->setMaximumSize(QSize(100, 23));
@@ -79,9 +77,9 @@ public:
 
     void retranslateUi(QWidget *SeriesSelectionDialog)
     {
-        SeriesSelectionDialog->setWindowTitle(QApplication::translate("SeriesSelectionDialog", "Form", Q_NULLPTR));
-        buttonOK->setText(QApplication::translate("SeriesSelectionDialog", "OK", Q_NULLPTR));
-        buttonCancel->setText(QApplication::translate("SeriesSelectionDialog", "Cancel", Q_NULLPTR));
+        SeriesSelectionDialog->setWindowTitle(QApplication::translate("SeriesSelectionDialog", "Form", nullptr));
+        buttonOK->setText(QApplication::translate("SeriesSelectionDialog", "OK", nullptr));
+        buttonCancel->setText(QApplication::translate("SeriesSelectionDialog", "Cancel", nullptr));
     } // retranslateUi
 
 };

@@ -97,5 +97,8 @@
     <ClInclude Include="GeneratedFiles\ui_RenameConfirmationDialog.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfoDLL\MediaInfoDLL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

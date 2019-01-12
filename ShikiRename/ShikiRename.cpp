@@ -11,6 +11,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QThread>
+#include <qtconcurrentrun.h>
 #include <QtNetwork/QNetworkReply>
 #include <QTimer>
 #include <QList>
@@ -32,7 +34,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->currentList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	ui->renamePreview->setSelectionMode(QAbstractItemView::NoSelection);
 
-	invalidFnCharset_win = QString(R"(\/:*?"<>|)");
+	invalidFnCharset_win = QString(R"(\/:*?"<>|)");	//charset of invalid Windows filename characters
 	QRegExp rgx_validFnCharset_win = QRegExp(QString("[^") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
 	QRegExpValidator* WIN_INVALID_FN = new QRegExpValidator(rgx_validFnCharset_win, this);
 
@@ -126,6 +128,9 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->actionRefresh->setDisabled(true);
 
 	ui->buttonRename->setDisabled(true);
+
+	//Multithread
+	//connect(&mediaInfoCacheWatcher, SIGNAL(finished()), this, SLOT(/* TODO */));
 
 	//Network requests
 	manager = new QNetworkAccessManager(this);
@@ -534,6 +539,9 @@ void ShikiRename::previewRename() {
 		bool selected = false;
 		QString v = it.next().completeBaseName();			//v = original filename without file extension
 		if (isSelectedInList(it.value().fileName())) {		//if enabled, checks if the file has been selected.
+			QString filePath = it.value().absoluteFilePath();
+			//mediaInfoCacheWatcher.setFuture(QtConcurrent::run(this, &ShikiRename::cacheMediaInfo, it.value()));
+			ShikiRename::cacheMediaInfo(it.value());
 			selected = true;
 			if (ui->tabWidget->currentIndex() == 0) {
 				//Remove left
@@ -601,7 +609,7 @@ void ShikiRename::previewRename() {
 						QJsonObject jo = item.toObject();
 						if (jo.value("airedSeason").toInt() == season && jo.value("airedEpisodeNumber").toInt() == ep) {
 							episodeName = jo.value("episodeName").toString();
-							episodeName.remove(rgx_invalidFnCharset_win);
+							episodeName.remove(rgx_invalidFnCharset_win);	//probably redundant because we're tidying it up again at the end anyway
 							episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
 							break;
 						}
@@ -619,7 +627,7 @@ void ShikiRename::previewRename() {
 					.replace(QString("<YEAR>"), input_vid_releaseYear)
 					.replace(QString("<LANGUAGE>"), input_vid_language)
 					.replace(QString("<AUDIO>"), input_vid_audio)
-					.replace(QString("<RESOLUTION>"), input_vid_videoResolution)
+					.replace(QString("<RESOLUTION>"), mediaInfoCache[filePath]["resolution"])
 					.replace(QString("<SOURCE>"), input_vid_src)
 					.replace(QString("<VIDEO>"), input_vid_video)
 					.replace(QString("<SCENE GROUP>"), input_vid_sceneGrp);
@@ -637,6 +645,25 @@ void ShikiRename::previewRename() {
 
 	ui->buttonRename->setEnabled(ui->renamePreview->count() > 0);
 }
+
+void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
+	QString filePath = fileInfo.absoluteFilePath();
+	QString lastModified = fileInfo.lastModified().toString();
+
+	if (mediaInfoCache.contains(filePath) && mediaInfoCache[filePath][lastModified].compare(lastModified, Qt::CaseInsensitive) == 0)
+		return;	//it's been already cached and hasn't been modified since
+
+	MI.Open(filePath.toStdWString());
+	QString fileType = fileInfo.suffix();
+	QString resolution = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Height"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name)) + "p";
+
+	QMap<QString, QString> mediaInfo;
+	mediaInfo["fileType"] = fileType;
+	mediaInfo["lastModified"] = lastModified;
+	mediaInfo["resolution"] = resolution;
+	mediaInfoCache[fileInfo.absoluteFilePath()] = mediaInfo;
+}
+
 void ShikiRename::on_buttonRename_clicked()
 {
 	QMessageBox errorDialog_renameFailed;
@@ -719,6 +746,13 @@ void ShikiRename::on_buttonRename_clicked()
 QString ShikiRename::zerofy(QString string, int digits) {
 	return QString(digits - string.length(), '0') + string;
 }
+
+/**
+ * Tries to find season and episode number inside a given string using a currently hardcoded pattern.
+ *
+ * @param filename_qs Text containing a type of naming pattern representing a season and an episode number
+ * @return Two numbers we assume to be season and episode numbers or (0,0) if detection failed. (Season, Episode)
+ */
 std::pair<int, int> ShikiRename::searchSeasonAndEpisode(QString filename_qs) {
 	std::string filename = filename_qs.toStdString();
 	std::regex rgx(R"([sS][^\d]*0*(\d+)[\s]*[^A-Za-z0-9]*[eE][^\d]*0*(\d+))");
