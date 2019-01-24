@@ -118,7 +118,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->buttonRename->setDisabled(true);
 
 	//Multithread
-	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(handleFileChanges()));	//restarts the directory watcher checking for file changes
+	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(handleFileChanges()));	//restarts the directory watcher checking for the next file change
 
 	//Network requests
 	manager = new QNetworkAccessManager(this);
@@ -138,6 +138,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 }
 ShikiRename::~ShikiRename()
 {
+	dirWatcher.cancel();
 	delete ui;
 }
 
@@ -410,11 +411,18 @@ void ShikiRename::open(QDir dir) {
 	previewRename();
 }
 
+/**
+ * Starts watching the current working directory for any file changes
+ */
 void ShikiRename::handleFileChanges() {
+	if (!dirWatcherFW.isFinished()) {
+		qDebug() << "DirWatcher is already waiting!";
+		return;
+	}
 	wchar_t* winDir = new wchar_t[curDir.length()+1];
-	curDir.toWCharArray(winDir);
-	winDir[curDir.length()] = 0;
-	QFuture<int> future = QtConcurrent::run(&this->dirWatcher, &DirWatcher::watchDirectory, winDir);
+	curDir.toWCharArray(winDir);	//convert path to wchar
+	winDir[curDir.length()] = 0;	//null termination
+	QFuture<int> future = QtConcurrent::run(&this->dirWatcher, &DirWatcher::watchDirectory, winDir); //starts the DirWatcher in another thread
 	dirWatcherFW.setFuture(future);
 }
 
@@ -429,7 +437,7 @@ void ShikiRename::on_actionOpen_triggered() {
 		this->open(dir);
 	}
 	else {
-		qDebug() << "Current working directory selected, assuming dialog has been canceled.";
+		qDebug() << "Current working directory selected.";
 	}
 }
 void ShikiRename::on_actionRefresh_triggered() {

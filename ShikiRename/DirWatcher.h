@@ -5,6 +5,10 @@
 
 class DirWatcher
 {
+private:
+	HANDLE watchCancelEvent;
 public:
+	DirWatcher();
 	int watchDirectory(LPTSTR);
+	void cancel();
 };
