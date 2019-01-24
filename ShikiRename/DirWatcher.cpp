@@ -3,6 +3,7 @@
 #include <QDebug>
 
 DirWatcher::DirWatcher(){
+	//aborts current directory watch
 	watchCancelEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 
@@ -60,6 +61,7 @@ int DirWatcher::watchDirectory(LPTSTR lpDir) {
 
 		case (WAIT_OBJECT_0 + 1):
 			qDebug() << "DirWatcher - Aborted by function call";
+			ResetEvent(watchCancelEvent);
 			return 0;
 		default:
 			qDebug() << "DirWatcher - ERROR: Unhandled dwWaitStatus.";

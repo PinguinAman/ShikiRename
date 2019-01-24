@@ -416,8 +416,8 @@ void ShikiRename::open(QDir dir) {
  */
 void ShikiRename::handleFileChanges() {
 	if (!dirWatcherFW.isFinished()) {
-		qDebug() << "DirWatcher is already waiting!";
-		return;
+		qDebug() << "Aborting current directory watch...";
+		dirWatcher.cancel();
 	}
 	wchar_t* winDir = new wchar_t[curDir.length()+1];
 	curDir.toWCharArray(winDir);	//convert path to wchar
