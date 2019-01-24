@@ -75,7 +75,7 @@ public:
 	void openDialogSeriesSelection(QJsonArray seriesData);
 	void on_seriesSelectedDialog_closed(const int &id, const QString &name);
 
-	void handleFileChanges();
+	void watchFileChanges();
 	void handleNetworkReply(QNetworkReply* reply);
 	void tvdbAuthError();
 	void tvdbFindSeries(QString name);

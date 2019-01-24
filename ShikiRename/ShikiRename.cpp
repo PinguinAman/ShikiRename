@@ -118,7 +118,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->buttonRename->setDisabled(true);
 
 	//Multithread
-	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(handleFileChanges()));	//restarts the directory watcher checking for the next file change
+	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_actionRefresh_triggered()));	//restarts the directory watcher checking for the next file change
 
 	//Network requests
 	manager = new QNetworkAccessManager(this);
@@ -407,19 +407,27 @@ void ShikiRename::open(QDir dir) {
 		ui->currentList->addItem(fn);
 	}
 
-	handleFileChanges();
+	watchFileChanges();
 	previewRename();
 }
 
 /**
  * Starts watching the current working directory for any file changes
  */
-void ShikiRename::handleFileChanges() {
+void ShikiRename::watchFileChanges() {
+	if (!mediaInfoCache.isEmpty()) {
+		for (auto item : mediaInfoCache.keys()) {
+			if (item.startsWith(curDir)) {
+				qDebug() << "Removing" << item << "from mediaInfoCache.";
+				mediaInfoCache.remove(item);
+			}
+		}
+	}
 	if (!dirWatcherFW.isFinished()) {
 		qDebug() << "Aborting current directory watch...";
 		dirWatcher.cancel();
 	}
-	wchar_t* winDir = new wchar_t[curDir.length()+1];
+	wchar_t* winDir = new wchar_t[curDir.length() + 1];
 	curDir.toWCharArray(winDir);	//convert path to wchar
 	winDir[curDir.length()] = 0;	//null termination
 	QFuture<int> future = QtConcurrent::run(&this->dirWatcher, &DirWatcher::watchDirectory, winDir); //starts the DirWatcher in another thread
@@ -427,17 +435,19 @@ void ShikiRename::handleFileChanges() {
 }
 
 void ShikiRename::on_actionOpen_triggered() {
-	QString openDir = QDir::homePath();
-	if (!curDir.isEmpty()) {
+	QString openDir;
+	if (!curDir.isEmpty())
 		openDir = curDir;
-	}
+	else
+		openDir = QDir::homePath();
+
 	QDir dir = QFileDialog::getExistingDirectory(this, tr("Select Directory"), openDir, QFileDialog::ShowDirsOnly);
 
 	if (dir.path() != ".") {
 		this->open(dir);
 	}
 	else {
-		qDebug() << "Current working directory selected.";
+		qDebug() << "Selection is already the current working directory.";
 	}
 }
 void ShikiRename::on_actionRefresh_triggered() {
@@ -503,7 +513,7 @@ void ShikiRename::addToHistory(int id, QString o, QString n) {
 }
 void ShikiRename::previewRename() {
 	QMutableListIterator<QFileInfo> it(infoList);
-	int cur_num = input_num_init;							//keeps track of the consecutive numeration
+	int cur_num = input_num_init;							//keeps track of our current number for the consecutive numeration operation
 	ui->renamePreview->clear();
 
 	while (it.hasNext())									//iterates through every file
@@ -515,7 +525,7 @@ void ShikiRename::previewRename() {
 
 			selected = true;
 			if (ui->tabWidget->currentIndex() == 0) {
-				//Remove left
+				//Remove left operation
 				if (input_remLeft > 0)
 					v = v.remove(0, input_remLeft);
 
@@ -622,18 +632,15 @@ void ShikiRename::previewRename() {
 
 void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
 	QString filePath = fileInfo.absoluteFilePath();
-	QString lastModified = fileInfo.lastModified().toString();
 
-	if (mediaInfoCache.contains(filePath) && mediaInfoCache[filePath][lastModified].compare(lastModified, Qt::CaseInsensitive) == 0)
-		return;	//it's been already cached and hasn't been modified since
+	if (mediaInfoCache.contains(filePath))
+		return;	//it's already cached
 
 	MI.Open(filePath.toStdWString());
 	QMap<QString, QString> mediaInfo;
 	QString fileType = fileInfo.suffix();
 	mediaInfo["fileType"] = fileType;
-	mediaInfo["lastModified"] = lastModified;
 
-	//qDebug() << fileTypes_video;
 	if (fileTypes_video.contains(fileType, Qt::CaseInsensitive)) {
 		QString resolution = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Height"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
 		if (!resolution.isEmpty())
@@ -652,6 +659,7 @@ void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
 		}
 	}
 
+	qDebug() << "Adding" << fileInfo.absoluteFilePath() << "to mediaInfoCache";
 	mediaInfoCache[fileInfo.absoluteFilePath()] = mediaInfo;
 }
 
@@ -774,16 +782,16 @@ int ShikiRename::searchEpisode(QString filename) {
 				if (isSelectedInList(s1)) {											//current idx must be in selection
 					QString s2 = fileNames.at(i + 1);
 					int j = i + 2;
-					for (; !isSelectedInList(s2) && j < fileNames.count();j++) {	//next idx must be in selection as well
-						i = j-1;													//next s1 shall be current s2, so move our s1 idx in front of our s2 idx so the next loop increments to s2 idx
+					for (; !isSelectedInList(s2) && j < fileNames.count(); j++) {	//next idx must be in selection as well
+						i = j - 1;													//next s1 shall be current s2, so move our s1 idx in front of our s2 idx so the next loop increments to s2 idx
 						s2 = fileNames.at(j);
 					}
 					if (!isSelectedInList(s2)) {									//last item reached & is not in selection
 						break;
 					}
 					//compare strings until a difference is found or until we've reached a previously determined index of a difference
-					for (int k = 0; k < s1.length() && (searchEpisode_startIdx == -1 || k < searchEpisode_startIdx); k++) {  
-						if (s1.at(k) != s2.at(k)) {									
+					for (int k = 0; k < s1.length() && (searchEpisode_startIdx == -1 || k < searchEpisode_startIdx); k++) {
+						if (s1.at(k) != s2.at(k)) {
 							searchEpisode_startIdx = k;
 							break;
 						}
@@ -792,7 +800,7 @@ int ShikiRename::searchEpisode(QString filename) {
 			}
 		}
 	}
-	
+
 	std::string string = filename.mid(searchEpisode_startIdx).toStdString();
 	std::regex rgx(R"([\D0]*(\d+)[\s\S]*)");
 	std::smatch match;
@@ -888,8 +896,8 @@ void ShikiRename::handleNetworkReply(QNetworkReply* reply) {
 		}
 		if (episodeData.count() % 100 == 0) {
 
-				this->tvdbFindEpisodes(seasonId, page+1);
-			
+			this->tvdbFindEpisodes(seasonId, page + 1);
+
 		}
 		else {
 			previewRename();
