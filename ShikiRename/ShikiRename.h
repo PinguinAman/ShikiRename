@@ -94,6 +94,7 @@ private:
 	const enum MetaDB { None = 0, TheTVDB = 1 };
 	const int TVDB_TIMEOUT = 20000;	//ms
 	QString invalidFnCharset_win;
+	QStringList fileTypes_video;
 
 	MediaInfoDLL::MediaInfo MI;
 	QMap<QString, QMap<QString, QString>> mediaInfoCache;

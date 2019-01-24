@@ -38,6 +38,8 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	QRegExp rgx_validFnCharset_win = QRegExp(QString("[^") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
 	QRegExpValidator* WIN_INVALID_FN = new QRegExpValidator(rgx_validFnCharset_win, this);
 
+	fileTypes_video = QStringList({ "mkv", "mp4", "avi" });
+
 	//TAB1
 	ui->editRemoveRight->setValidator(new QIntValidator(0, MAX_INT, this));
 	ui->editRemoveLeft->setValidator(new QIntValidator(0, MAX_INT, this));
@@ -604,6 +606,7 @@ void ShikiRename::previewRename() {
 
 				QString episodeName;
 				QString episodeAbsolute;
+				QString episodeYear;
 				if (!episodeData.empty() && !episodeData.first().toObject().value("episodeName").isUndefined()) {
 					for (auto item : episodeData) {
 						QJsonObject jo = item.toObject();
@@ -611,6 +614,7 @@ void ShikiRename::previewRename() {
 							episodeName = jo.value("episodeName").toString();
 							episodeName.remove(rgx_invalidFnCharset_win);	//probably redundant because we're tidying it up again at the end anyway
 							episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
+							episodeYear = jo.value("firstAired").toString().left(4);
 							break;
 						}
 					}
@@ -624,12 +628,12 @@ void ShikiRename::previewRename() {
 					.replace(QString("<EPISODE>"), this->zerofy(QString::number(ep), input_vid_eDigits))
 					.replace(QString("<EPISODE ABSOLUTE>"), this->zerofy(episodeAbsolute, input_vid_eDigits))
 					.replace(QString("<EPISODE NAME>"), episodeName)
-					.replace(QString("<YEAR>"), input_vid_releaseYear)
+					.replace(QString("<YEAR>"), episodeYear)
 					.replace(QString("<LANGUAGE>"), input_vid_language)
 					.replace(QString("<AUDIO>"), input_vid_audio)
 					.replace(QString("<RESOLUTION>"), mediaInfoCache[filePath]["resolution"])
 					.replace(QString("<SOURCE>"), input_vid_src)
-					.replace(QString("<VIDEO>"), input_vid_video)
+					.replace(QString("<VIDEO>"), mediaInfoCache[filePath]["codec"])
 					.replace(QString("<SCENE GROUP>"), input_vid_sceneGrp);
 				v.remove(rgx_invalidFnCharset_win);
 			}
@@ -654,13 +658,30 @@ void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
 		return;	//it's been already cached and hasn't been modified since
 
 	MI.Open(filePath.toStdWString());
-	QString fileType = fileInfo.suffix();
-	QString resolution = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Height"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name)) + "p";
-
 	QMap<QString, QString> mediaInfo;
+	QString fileType = fileInfo.suffix();
 	mediaInfo["fileType"] = fileType;
 	mediaInfo["lastModified"] = lastModified;
-	mediaInfo["resolution"] = resolution;
+
+	//qDebug() << fileTypes_video;
+	if (fileTypes_video.contains(fileType, Qt::CaseInsensitive)) {
+		QString resolution = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Height"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+		if (!resolution.isEmpty())
+			resolution.append("p");
+		mediaInfo["resolution"] = resolution;
+
+		QString codecID = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("CodecID"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+		if (codecID.compare("V_MPEG4/ISO/AVC", Qt::CaseInsensitive) == 0) {
+			mediaInfo["codec"] = "x264";
+		}
+		else if (codecID.compare("V_MPEGH/ISO/HEVC", Qt::CaseInsensitive) == 0) {
+			mediaInfo["codec"] = "x265";
+		}
+		else if (codecID.compare("XVID", Qt::CaseInsensitive) == 0) {
+			mediaInfo["codec"] = "XviD";
+		}
+	}
+
 	mediaInfoCache[fileInfo.absoluteFilePath()] = mediaInfo;
 }
 
