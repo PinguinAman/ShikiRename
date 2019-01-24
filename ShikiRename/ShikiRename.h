@@ -15,6 +15,7 @@
 #include <QJsonArray>
 #include <regex>
 #include "MediaInfoDLL/MediaInfoDLL.h" //Dynamicly-loaded library (.dll or .so)
+#include <DirWatcher.h>
 
 namespace Ui {
 	class ShikiRenameClass;
@@ -74,6 +75,7 @@ public:
 	void openDialogSeriesSelection(QJsonArray seriesData);
 	void on_seriesSelectedDialog_closed(const int &id, const QString &name);
 
+	void handleFileChanges();
 	void handleNetworkReply(QNetworkReply* reply);
 	void tvdbAuthError();
 	void tvdbFindSeries(QString name);
@@ -116,6 +118,7 @@ private:
 	void tvdbFindEpisodes(int seriesId, int page);
 	void tvdbGetLanguages();
 
+	DirWatcher dirWatcher;
 	QString curDir = "";
 	QFileInfoList infoList;
 	QStringList filenames;
@@ -153,7 +156,7 @@ private:
 	QString releaseDataSuffix;
 	bool input_epDetection = false;
 	bool ongoingSeriesSelection = false;
-	//QFutureWatcher<void> mediaInfoCacheWatcher;
+	QFutureWatcher<int> dirWatcherFW;
 	QNetworkAccessManager *manager;
 	QByteArray tvdbAuthToken;
 	QTimer *tvdbAuthTimer;

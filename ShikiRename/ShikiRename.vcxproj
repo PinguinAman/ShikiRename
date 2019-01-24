@@ -77,6 +77,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DirWatcher.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_RenameConfirmationDialog.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -143,6 +144,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DirWatcher.h" />
     <ClInclude Include="GeneratedFiles\ui_RenameConfirmationDialog.h" />
     <ClInclude Include="GeneratedFiles\ui_SeriesSelectionDialog.h" />
     <ClInclude Include="GeneratedFiles\ui_ShikiRename.h" />

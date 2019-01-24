@@ -63,6 +63,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_ShikiRename.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="DirWatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ShikiRename.h">
@@ -98,6 +101,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="MediaInfoDLL\MediaInfoDLL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DirWatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

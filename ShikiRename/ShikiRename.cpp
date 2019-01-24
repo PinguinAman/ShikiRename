@@ -118,7 +118,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->buttonRename->setDisabled(true);
 
 	//Multithread
-	//connect(&mediaInfoCacheWatcher, SIGNAL(finished()), this, SLOT(/* TODO */));
+	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(handleFileChanges()));	//restarts the directory watcher checking for file changes
 
 	//Network requests
 	manager = new QNetworkAccessManager(this);
@@ -405,8 +405,19 @@ void ShikiRename::open(QDir dir) {
 		ui->renamePreview->addItem(fn);
 		ui->currentList->addItem(fn);
 	}
+
+	handleFileChanges();
 	previewRename();
 }
+
+void ShikiRename::handleFileChanges() {
+	wchar_t* winDir = new wchar_t[curDir.length()+1];
+	curDir.toWCharArray(winDir);
+	winDir[curDir.length()] = 0;
+	QFuture<int> future = QtConcurrent::run(&this->dirWatcher, &DirWatcher::watchDirectory, winDir);
+	dirWatcherFW.setFuture(future);
+}
+
 void ShikiRename::on_actionOpen_triggered() {
 	QString openDir = QDir::homePath();
 	if (!curDir.isEmpty()) {
@@ -493,8 +504,7 @@ void ShikiRename::previewRename() {
 		QString v = it.next().completeBaseName();			//v = original filename without file extension
 		if (isSelectedInList(it.value().fileName())) {		//if enabled, checks if the file has been selected.
 			QString filePath = it.value().absoluteFilePath();
-			//mediaInfoCacheWatcher.setFuture(QtConcurrent::run(this, &ShikiRename::cacheMediaInfo, it.value()));
-			ShikiRename::cacheMediaInfo(it.value());
+
 			selected = true;
 			if (ui->tabWidget->currentIndex() == 0) {
 				//Remove left
@@ -542,6 +552,7 @@ void ShikiRename::previewRename() {
 
 			}
 			else if (ui->tabWidget->currentIndex() == 1) {
+				ShikiRename::cacheMediaInfo(it.value());
 				QRegExp rgx_invalidFnCharset_win = QRegExp(QString("[") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
 				std::pair<int, int> s_e = this->searchSeasonAndEpisode(v);
 				int season;

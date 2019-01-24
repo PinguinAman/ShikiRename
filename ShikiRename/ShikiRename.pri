@@ -7,14 +7,16 @@
 message("You are running qmake on a generated .pro file. This may not work!")
 
 
-HEADERS += ./ShikiRename.h \
-    ./SeriesSelectionDialog.h \
+HEADERS += ./MediaInfoDLL/MediaInfoDLL.h \
+    ./ShikiRename.h \
     ./RenameConfirmationDialog.h \
-    $$PWD/MediaInfoDLL/MediaInfoDLL.h
+    ./SeriesSelectionDialog.h \
+    ./DirWatcher.h
 SOURCES += ./main.cpp \
+    ./RenameConfirmationDialog.cpp \
     ./ShikiRename.cpp \
     ./SeriesSelectionDialog.cpp \
-    ./RenameConfirmationDialog.cpp
+    ./DirWatcher.cpp
 FORMS += ./ShikiRename.ui \
     ./SeriesSelectionDialog.ui \
     ./RenameConfirmationDialog.ui
