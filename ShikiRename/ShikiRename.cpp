@@ -107,20 +107,6 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->editEpisodeNrDigits->setValidator(new QIntValidator(1, MAX_INT, this));
 	ui->editEpisodeNrDigits->setToolTip(tt_ENUMB);
 	ui->checkboxNoSeason->setToolTip(tt_GEPNR);
-	ui->editYear->setValidator(WIN_INVALID_FN);
-	ui->editYear->setToolTip(tt_RYEAR);
-	ui->editLang->setValidator(WIN_INVALID_FN);
-	ui->editLang->setToolTip(tt_SLANG);
-	ui->editAudio->setValidator(WIN_INVALID_FN);
-	ui->editAudio->setToolTip(tt_AUDIO);
-	ui->editResolution->setValidator(WIN_INVALID_FN);
-	ui->editResolution->setToolTip(tt_RESOL);
-	ui->editSource->setValidator(WIN_INVALID_FN);
-	ui->editSource->setToolTip(tt_SOURC);
-	ui->editVideo->setValidator(WIN_INVALID_FN);
-	ui->editVideo->setToolTip(tt_VIDEO);
-	ui->editSceneGrp->setValidator(WIN_INVALID_FN);
-	ui->editSceneGrp->setToolTip(tt_GROUP);
 
 	//Menubar
 	ui->actionUndo->setEnabled(false);
@@ -378,41 +364,6 @@ void ShikiRename::on_comboEpisodeNameLang_currentIndexChanged(const int &index)
 		}
 	}
 }
-void ShikiRename::on_editYear_textChanged(const QString &arg1)
-{
-	input_vid_releaseYear = arg1;
-	this->previewRename();
-}
-void ShikiRename::on_editLang_textChanged(const QString &arg1)
-{
-	input_vid_language = arg1;
-	this->previewRename();
-}
-void ShikiRename::on_editAudio_textChanged(const QString &arg1)
-{
-	input_vid_audio = arg1;
-	this->previewRename();
-}
-void ShikiRename::on_editResolution_textChanged(const QString &arg1)
-{
-	input_vid_videoResolution = arg1;
-	this->previewRename();
-}
-void ShikiRename::on_editVideo_textChanged(const QString &arg1)
-{
-	input_vid_video = arg1;
-	this->previewRename();
-}
-void ShikiRename::on_editSource_textChanged(const QString &arg1)
-{
-	input_vid_src = arg1;
-	this->previewRename();
-}
-void ShikiRename::on_editSceneGrp_textChanged(const QString &arg1)
-{
-	input_vid_sceneGrp = arg1;
-	this->previewRename();
-}
 
 void ShikiRename::on_checkboxOnlySelected_toggled(const bool &checked)
 {
@@ -629,12 +580,12 @@ void ShikiRename::previewRename() {
 					.replace(QString("<EPISODE ABSOLUTE>"), this->zerofy(episodeAbsolute, input_vid_eDigits))
 					.replace(QString("<EPISODE NAME>"), episodeName)
 					.replace(QString("<YEAR>"), episodeYear)
-					.replace(QString("<LANGUAGE>"), input_vid_language)
-					.replace(QString("<AUDIO>"), input_vid_audio)
+					.replace(QString("<LANGUAGE>"), "")
+					.replace(QString("<AUDIO>"), "")
 					.replace(QString("<RESOLUTION>"), mediaInfoCache[filePath]["resolution"])
-					.replace(QString("<SOURCE>"), input_vid_src)
+					.replace(QString("<SOURCE>"), "")
 					.replace(QString("<VIDEO>"), mediaInfoCache[filePath]["codec"])
-					.replace(QString("<SCENE GROUP>"), input_vid_sceneGrp);
+					.replace(QString("<SCENE GROUP>"), "");
 				v.remove(rgx_invalidFnCharset_win);
 			}
 		}

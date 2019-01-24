@@ -367,10 +367,10 @@
             <x>0</x>
             <y>0</y>
             <width>1071</width>
-            <height>260</height>
+            <height>131</height>
            </rect>
           </property>
-          <layout class="QGridLayout" name="tab_2_gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0" columnstretch="0,25,0,25,0">
+          <layout class="QGridLayout" name="tab_2_gridLayout" rowstretch="0,0,0,0,0" columnstretch="0,0,0,0,0">
            <property name="sizeConstraint">
             <enum>QLayout::SetNoConstraint</enum>
            </property>
@@ -386,6 +386,16 @@
            <property name="bottomMargin">
             <number>10</number>
            </property>
+           <item row="3" column="3">
+            <widget class="QLineEdit" name="editEpisodeNrDigits">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="placeholderText">
+              <string>2</string>
+             </property>
+            </widget>
+           </item>
            <item row="2" column="1">
             <widget class="QLineEdit" name="editSeasonNrPrefix">
              <property name="text">
@@ -396,13 +406,6 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="2">
-            <widget class="QLabel" name="labelResolution">
-             <property name="text">
-              <string>Video Resolution</string>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="1">
             <widget class="QLineEdit" name="editEpisodeNrPrefix">
              <property name="text">
@@ -410,6 +413,19 @@
              </property>
              <property name="placeholderText">
               <string>e</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="3">
+            <widget class="QLineEdit" name="editCustomFileName"/>
+           </item>
+           <item row="4" column="3" colspan="2">
+            <widget class="QComboBox" name="comboEpisodeNameLang"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="labelEpisodeNameSrc">
+             <property name="text">
+              <string>Episode Name Source</string>
              </property>
             </widget>
            </item>
@@ -427,43 +443,6 @@
              </item>
             </widget>
            </item>
-           <item row="4" column="2">
-            <widget class="QLabel" name="labelEpisodeNameLang">
-             <property name="text">
-              <string>Language</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="labelName">
-             <property name="text">
-              <string>Name</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="1">
-            <widget class="QLineEdit" name="editSceneGrp"/>
-           </item>
-           <item row="8" column="1">
-            <widget class="QLineEdit" name="editSource"/>
-           </item>
-           <item row="3" column="2">
-            <widget class="QLabel" name="labelEpisodeNrDigits">
-             <property name="text">
-              <string>Digits</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="labelEpisodeNameSrc">
-             <property name="text">
-              <string>Episode Name Source</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="1">
-            <widget class="QLineEdit" name="editAudio"/>
-           </item>
            <item row="3" column="0">
             <widget class="QLabel" name="labelEpisodeNrPrefix">
              <property name="text">
@@ -471,62 +450,17 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="labelAudio">
-             <property name="text">
-              <string>Audio Info</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QLineEdit" name="editYear"/>
-           </item>
-           <item row="8" column="2">
-            <widget class="QLabel" name="labelVideo">
-             <property name="text">
-              <string>Video Info</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="labelYear">
-             <property name="text">
-              <string>Release Year</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="labelSource">
-             <property name="text">
-              <string>Source</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="labelScreneGrp">
-             <property name="text">
-              <string>Scene Group</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="checkboxCustomFileName">
-             <property name="text">
-              <string>Customize File Name</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="QLabel" name="label">
+           <item row="4" column="2">
+            <widget class="QLabel" name="labelEpisodeNameLang">
              <property name="text">
               <string>Language</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="2">
-            <widget class="QLabel" name="labelSeasonNrDigits">
+           <item row="2" column="4" rowspan="2">
+            <widget class="QCheckBox" name="checkboxNoSeason">
              <property name="text">
-              <string>Digits</string>
+              <string>No season numbers</string>
              </property>
             </widget>
            </item>
@@ -544,28 +478,27 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="3" colspan="2">
-            <widget class="QLineEdit" name="editLang"/>
-           </item>
-           <item row="7" column="3" colspan="2">
-            <widget class="QLineEdit" name="editResolution"/>
-           </item>
-           <item row="4" column="3" colspan="2">
-            <widget class="QComboBox" name="comboEpisodeNameLang"/>
-           </item>
-           <item row="8" column="3" colspan="2">
-            <widget class="QLineEdit" name="editVideo"/>
-           </item>
            <item row="1" column="1" colspan="4">
             <widget class="QLineEdit" name="editName"/>
            </item>
-           <item row="0" column="1" colspan="3">
-            <widget class="QLineEdit" name="editCustomFileName"/>
+           <item row="2" column="2">
+            <widget class="QLabel" name="labelSeasonNrDigits">
+             <property name="text">
+              <string>Digits</string>
+             </property>
+            </widget>
            </item>
-           <item row="5" column="0" colspan="5">
-            <widget class="Line" name="labelLang">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+           <item row="3" column="2">
+            <widget class="QLabel" name="labelEpisodeNrDigits">
+             <property name="text">
+              <string>Digits</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="labelName">
+             <property name="text">
+              <string>Name</string>
              </property>
             </widget>
            </item>
@@ -579,20 +512,10 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="3">
-            <widget class="QLineEdit" name="editEpisodeNrDigits">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="checkboxCustomFileName">
              <property name="text">
-              <string/>
-             </property>
-             <property name="placeholderText">
-              <string>2</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="4" rowspan="2">
-            <widget class="QCheckBox" name="checkboxNoSeason">
-             <property name="text">
-              <string>No season numbers</string>
+              <string>Customize File Name</string>
              </property>
             </widget>
            </item>
@@ -686,7 +609,6 @@
   <tabstop>editEpisodeNrDigits</tabstop>
   <tabstop>comboEpisodeNameSrc</tabstop>
   <tabstop>comboEpisodeNameLang</tabstop>
-  <tabstop>editYear</tabstop>
   <tabstop>buttonRename</tabstop>
  </tabstops>
  <resources/>

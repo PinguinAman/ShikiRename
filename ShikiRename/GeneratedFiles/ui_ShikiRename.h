@@ -89,39 +89,24 @@ public:
     QWidget *tab_2;
     QWidget *gridLayoutWidget;
     QGridLayout *tab_2_gridLayout;
+    QLineEdit *editEpisodeNrDigits;
     QLineEdit *editSeasonNrPrefix;
-    QLabel *labelResolution;
     QLineEdit *editEpisodeNrPrefix;
-    QComboBox *comboEpisodeNameSrc;
-    QLabel *labelEpisodeNameLang;
-    QLabel *labelName;
-    QLineEdit *editSceneGrp;
-    QLineEdit *editSource;
-    QLabel *labelEpisodeNrDigits;
+    QLineEdit *editCustomFileName;
+    QComboBox *comboEpisodeNameLang;
     QLabel *labelEpisodeNameSrc;
-    QLineEdit *editAudio;
+    QComboBox *comboEpisodeNameSrc;
     QLabel *labelEpisodeNrPrefix;
-    QLabel *labelAudio;
-    QLineEdit *editYear;
-    QLabel *labelVideo;
-    QLabel *labelYear;
-    QLabel *labelSource;
-    QLabel *labelScreneGrp;
-    QCheckBox *checkboxCustomFileName;
-    QLabel *label;
-    QLabel *labelSeasonNrDigits;
+    QLabel *labelEpisodeNameLang;
+    QCheckBox *checkboxNoSeason;
     QLabel *labelSeasonNrPrefix;
     QPushButton *buttonCustomFileNameReset;
-    QLineEdit *editLang;
-    QLineEdit *editResolution;
-    QComboBox *comboEpisodeNameLang;
-    QLineEdit *editVideo;
     QLineEdit *editName;
-    QLineEdit *editCustomFileName;
-    QFrame *labelLang;
+    QLabel *labelSeasonNrDigits;
+    QLabel *labelEpisodeNrDigits;
+    QLabel *labelName;
     QLineEdit *editSeasonNrDigits;
-    QLineEdit *editEpisodeNrDigits;
-    QCheckBox *checkboxNoSeason;
+    QCheckBox *checkboxCustomFileName;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -391,27 +376,42 @@ public:
         tab_2->setObjectName(QString::fromUtf8("tab_2"));
         gridLayoutWidget = new QWidget(tab_2);
         gridLayoutWidget->setObjectName(QString::fromUtf8("gridLayoutWidget"));
-        gridLayoutWidget->setGeometry(QRect(0, 0, 1071, 260));
+        gridLayoutWidget->setGeometry(QRect(0, 0, 1071, 131));
         tab_2_gridLayout = new QGridLayout(gridLayoutWidget);
         tab_2_gridLayout->setSpacing(6);
         tab_2_gridLayout->setContentsMargins(11, 11, 11, 11);
         tab_2_gridLayout->setObjectName(QString::fromUtf8("tab_2_gridLayout"));
         tab_2_gridLayout->setSizeConstraint(QLayout::SetNoConstraint);
         tab_2_gridLayout->setContentsMargins(10, 10, 10, 10);
+        editEpisodeNrDigits = new QLineEdit(gridLayoutWidget);
+        editEpisodeNrDigits->setObjectName(QString::fromUtf8("editEpisodeNrDigits"));
+
+        tab_2_gridLayout->addWidget(editEpisodeNrDigits, 3, 3, 1, 1);
+
         editSeasonNrPrefix = new QLineEdit(gridLayoutWidget);
         editSeasonNrPrefix->setObjectName(QString::fromUtf8("editSeasonNrPrefix"));
 
         tab_2_gridLayout->addWidget(editSeasonNrPrefix, 2, 1, 1, 1);
 
-        labelResolution = new QLabel(gridLayoutWidget);
-        labelResolution->setObjectName(QString::fromUtf8("labelResolution"));
-
-        tab_2_gridLayout->addWidget(labelResolution, 7, 2, 1, 1);
-
         editEpisodeNrPrefix = new QLineEdit(gridLayoutWidget);
         editEpisodeNrPrefix->setObjectName(QString::fromUtf8("editEpisodeNrPrefix"));
 
         tab_2_gridLayout->addWidget(editEpisodeNrPrefix, 3, 1, 1, 1);
+
+        editCustomFileName = new QLineEdit(gridLayoutWidget);
+        editCustomFileName->setObjectName(QString::fromUtf8("editCustomFileName"));
+
+        tab_2_gridLayout->addWidget(editCustomFileName, 0, 1, 1, 3);
+
+        comboEpisodeNameLang = new QComboBox(gridLayoutWidget);
+        comboEpisodeNameLang->setObjectName(QString::fromUtf8("comboEpisodeNameLang"));
+
+        tab_2_gridLayout->addWidget(comboEpisodeNameLang, 4, 3, 1, 2);
+
+        labelEpisodeNameSrc = new QLabel(gridLayoutWidget);
+        labelEpisodeNameSrc->setObjectName(QString::fromUtf8("labelEpisodeNameSrc"));
+
+        tab_2_gridLayout->addWidget(labelEpisodeNameSrc, 4, 0, 1, 1);
 
         comboEpisodeNameSrc = new QComboBox(gridLayoutWidget);
         comboEpisodeNameSrc->addItem(QString());
@@ -420,90 +420,20 @@ public:
 
         tab_2_gridLayout->addWidget(comboEpisodeNameSrc, 4, 1, 1, 1);
 
-        labelEpisodeNameLang = new QLabel(gridLayoutWidget);
-        labelEpisodeNameLang->setObjectName(QString::fromUtf8("labelEpisodeNameLang"));
-
-        tab_2_gridLayout->addWidget(labelEpisodeNameLang, 4, 2, 1, 1);
-
-        labelName = new QLabel(gridLayoutWidget);
-        labelName->setObjectName(QString::fromUtf8("labelName"));
-
-        tab_2_gridLayout->addWidget(labelName, 1, 0, 1, 1);
-
-        editSceneGrp = new QLineEdit(gridLayoutWidget);
-        editSceneGrp->setObjectName(QString::fromUtf8("editSceneGrp"));
-
-        tab_2_gridLayout->addWidget(editSceneGrp, 9, 1, 1, 1);
-
-        editSource = new QLineEdit(gridLayoutWidget);
-        editSource->setObjectName(QString::fromUtf8("editSource"));
-
-        tab_2_gridLayout->addWidget(editSource, 8, 1, 1, 1);
-
-        labelEpisodeNrDigits = new QLabel(gridLayoutWidget);
-        labelEpisodeNrDigits->setObjectName(QString::fromUtf8("labelEpisodeNrDigits"));
-
-        tab_2_gridLayout->addWidget(labelEpisodeNrDigits, 3, 2, 1, 1);
-
-        labelEpisodeNameSrc = new QLabel(gridLayoutWidget);
-        labelEpisodeNameSrc->setObjectName(QString::fromUtf8("labelEpisodeNameSrc"));
-
-        tab_2_gridLayout->addWidget(labelEpisodeNameSrc, 4, 0, 1, 1);
-
-        editAudio = new QLineEdit(gridLayoutWidget);
-        editAudio->setObjectName(QString::fromUtf8("editAudio"));
-
-        tab_2_gridLayout->addWidget(editAudio, 7, 1, 1, 1);
-
         labelEpisodeNrPrefix = new QLabel(gridLayoutWidget);
         labelEpisodeNrPrefix->setObjectName(QString::fromUtf8("labelEpisodeNrPrefix"));
 
         tab_2_gridLayout->addWidget(labelEpisodeNrPrefix, 3, 0, 1, 1);
 
-        labelAudio = new QLabel(gridLayoutWidget);
-        labelAudio->setObjectName(QString::fromUtf8("labelAudio"));
+        labelEpisodeNameLang = new QLabel(gridLayoutWidget);
+        labelEpisodeNameLang->setObjectName(QString::fromUtf8("labelEpisodeNameLang"));
 
-        tab_2_gridLayout->addWidget(labelAudio, 7, 0, 1, 1);
+        tab_2_gridLayout->addWidget(labelEpisodeNameLang, 4, 2, 1, 1);
 
-        editYear = new QLineEdit(gridLayoutWidget);
-        editYear->setObjectName(QString::fromUtf8("editYear"));
+        checkboxNoSeason = new QCheckBox(gridLayoutWidget);
+        checkboxNoSeason->setObjectName(QString::fromUtf8("checkboxNoSeason"));
 
-        tab_2_gridLayout->addWidget(editYear, 6, 1, 1, 1);
-
-        labelVideo = new QLabel(gridLayoutWidget);
-        labelVideo->setObjectName(QString::fromUtf8("labelVideo"));
-
-        tab_2_gridLayout->addWidget(labelVideo, 8, 2, 1, 1);
-
-        labelYear = new QLabel(gridLayoutWidget);
-        labelYear->setObjectName(QString::fromUtf8("labelYear"));
-
-        tab_2_gridLayout->addWidget(labelYear, 6, 0, 1, 1);
-
-        labelSource = new QLabel(gridLayoutWidget);
-        labelSource->setObjectName(QString::fromUtf8("labelSource"));
-
-        tab_2_gridLayout->addWidget(labelSource, 8, 0, 1, 1);
-
-        labelScreneGrp = new QLabel(gridLayoutWidget);
-        labelScreneGrp->setObjectName(QString::fromUtf8("labelScreneGrp"));
-
-        tab_2_gridLayout->addWidget(labelScreneGrp, 9, 0, 1, 1);
-
-        checkboxCustomFileName = new QCheckBox(gridLayoutWidget);
-        checkboxCustomFileName->setObjectName(QString::fromUtf8("checkboxCustomFileName"));
-
-        tab_2_gridLayout->addWidget(checkboxCustomFileName, 0, 0, 1, 1);
-
-        label = new QLabel(gridLayoutWidget);
-        label->setObjectName(QString::fromUtf8("label"));
-
-        tab_2_gridLayout->addWidget(label, 6, 2, 1, 1);
-
-        labelSeasonNrDigits = new QLabel(gridLayoutWidget);
-        labelSeasonNrDigits->setObjectName(QString::fromUtf8("labelSeasonNrDigits"));
-
-        tab_2_gridLayout->addWidget(labelSeasonNrDigits, 2, 2, 1, 1);
+        tab_2_gridLayout->addWidget(checkboxNoSeason, 2, 4, 2, 1);
 
         labelSeasonNrPrefix = new QLabel(gridLayoutWidget);
         labelSeasonNrPrefix->setObjectName(QString::fromUtf8("labelSeasonNrPrefix"));
@@ -515,60 +445,36 @@ public:
 
         tab_2_gridLayout->addWidget(buttonCustomFileNameReset, 0, 4, 1, 1);
 
-        editLang = new QLineEdit(gridLayoutWidget);
-        editLang->setObjectName(QString::fromUtf8("editLang"));
-
-        tab_2_gridLayout->addWidget(editLang, 6, 3, 1, 2);
-
-        editResolution = new QLineEdit(gridLayoutWidget);
-        editResolution->setObjectName(QString::fromUtf8("editResolution"));
-
-        tab_2_gridLayout->addWidget(editResolution, 7, 3, 1, 2);
-
-        comboEpisodeNameLang = new QComboBox(gridLayoutWidget);
-        comboEpisodeNameLang->setObjectName(QString::fromUtf8("comboEpisodeNameLang"));
-
-        tab_2_gridLayout->addWidget(comboEpisodeNameLang, 4, 3, 1, 2);
-
-        editVideo = new QLineEdit(gridLayoutWidget);
-        editVideo->setObjectName(QString::fromUtf8("editVideo"));
-
-        tab_2_gridLayout->addWidget(editVideo, 8, 3, 1, 2);
-
         editName = new QLineEdit(gridLayoutWidget);
         editName->setObjectName(QString::fromUtf8("editName"));
 
         tab_2_gridLayout->addWidget(editName, 1, 1, 1, 4);
 
-        editCustomFileName = new QLineEdit(gridLayoutWidget);
-        editCustomFileName->setObjectName(QString::fromUtf8("editCustomFileName"));
+        labelSeasonNrDigits = new QLabel(gridLayoutWidget);
+        labelSeasonNrDigits->setObjectName(QString::fromUtf8("labelSeasonNrDigits"));
 
-        tab_2_gridLayout->addWidget(editCustomFileName, 0, 1, 1, 3);
+        tab_2_gridLayout->addWidget(labelSeasonNrDigits, 2, 2, 1, 1);
 
-        labelLang = new QFrame(gridLayoutWidget);
-        labelLang->setObjectName(QString::fromUtf8("labelLang"));
-        labelLang->setFrameShape(QFrame::HLine);
-        labelLang->setFrameShadow(QFrame::Sunken);
+        labelEpisodeNrDigits = new QLabel(gridLayoutWidget);
+        labelEpisodeNrDigits->setObjectName(QString::fromUtf8("labelEpisodeNrDigits"));
 
-        tab_2_gridLayout->addWidget(labelLang, 5, 0, 1, 5);
+        tab_2_gridLayout->addWidget(labelEpisodeNrDigits, 3, 2, 1, 1);
+
+        labelName = new QLabel(gridLayoutWidget);
+        labelName->setObjectName(QString::fromUtf8("labelName"));
+
+        tab_2_gridLayout->addWidget(labelName, 1, 0, 1, 1);
 
         editSeasonNrDigits = new QLineEdit(gridLayoutWidget);
         editSeasonNrDigits->setObjectName(QString::fromUtf8("editSeasonNrDigits"));
 
         tab_2_gridLayout->addWidget(editSeasonNrDigits, 2, 3, 1, 1);
 
-        editEpisodeNrDigits = new QLineEdit(gridLayoutWidget);
-        editEpisodeNrDigits->setObjectName(QString::fromUtf8("editEpisodeNrDigits"));
+        checkboxCustomFileName = new QCheckBox(gridLayoutWidget);
+        checkboxCustomFileName->setObjectName(QString::fromUtf8("checkboxCustomFileName"));
 
-        tab_2_gridLayout->addWidget(editEpisodeNrDigits, 3, 3, 1, 1);
+        tab_2_gridLayout->addWidget(checkboxCustomFileName, 0, 0, 1, 1);
 
-        checkboxNoSeason = new QCheckBox(gridLayoutWidget);
-        checkboxNoSeason->setObjectName(QString::fromUtf8("checkboxNoSeason"));
-
-        tab_2_gridLayout->addWidget(checkboxNoSeason, 2, 4, 2, 1);
-
-        tab_2_gridLayout->setColumnStretch(1, 25);
-        tab_2_gridLayout->setColumnStretch(3, 25);
         tabWidget->addTab(tab_2, QString());
 
         vLayout_Main->addWidget(tabWidget);
@@ -614,8 +520,7 @@ public:
         QWidget::setTabOrder(editEpisodeNrPrefix, editEpisodeNrDigits);
         QWidget::setTabOrder(editEpisodeNrDigits, comboEpisodeNameSrc);
         QWidget::setTabOrder(comboEpisodeNameSrc, comboEpisodeNameLang);
-        QWidget::setTabOrder(comboEpisodeNameLang, editYear);
-        QWidget::setTabOrder(editYear, buttonRename);
+        QWidget::setTabOrder(comboEpisodeNameLang, buttonRename);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
@@ -672,34 +577,27 @@ public:
         editNumDigits->setText(QString());
         editNumDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "1", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_1), QApplication::translate("ShikiRenameClass", "Edit", nullptr));
+        editEpisodeNrDigits->setText(QString());
+        editEpisodeNrDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "2", nullptr));
         editSeasonNrPrefix->setText(QString());
         editSeasonNrPrefix->setPlaceholderText(QApplication::translate("ShikiRenameClass", "s", nullptr));
-        labelResolution->setText(QApplication::translate("ShikiRenameClass", "Video Resolution", nullptr));
         editEpisodeNrPrefix->setText(QString());
         editEpisodeNrPrefix->setPlaceholderText(QApplication::translate("ShikiRenameClass", "e", nullptr));
+        labelEpisodeNameSrc->setText(QApplication::translate("ShikiRenameClass", "Episode Name Source", nullptr));
         comboEpisodeNameSrc->setItemText(0, QString());
         comboEpisodeNameSrc->setItemText(1, QApplication::translate("ShikiRenameClass", "TheTVDB.com", nullptr));
 
-        labelEpisodeNameLang->setText(QApplication::translate("ShikiRenameClass", "Language", nullptr));
-        labelName->setText(QApplication::translate("ShikiRenameClass", "Name", nullptr));
-        labelEpisodeNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
-        labelEpisodeNameSrc->setText(QApplication::translate("ShikiRenameClass", "Episode Name Source", nullptr));
         labelEpisodeNrPrefix->setText(QApplication::translate("ShikiRenameClass", "Prefix Episode Number", nullptr));
-        labelAudio->setText(QApplication::translate("ShikiRenameClass", "Audio Info", nullptr));
-        labelVideo->setText(QApplication::translate("ShikiRenameClass", "Video Info", nullptr));
-        labelYear->setText(QApplication::translate("ShikiRenameClass", "Release Year", nullptr));
-        labelSource->setText(QApplication::translate("ShikiRenameClass", "Source", nullptr));
-        labelScreneGrp->setText(QApplication::translate("ShikiRenameClass", "Scene Group", nullptr));
-        checkboxCustomFileName->setText(QApplication::translate("ShikiRenameClass", "Customize File Name", nullptr));
-        label->setText(QApplication::translate("ShikiRenameClass", "Language", nullptr));
-        labelSeasonNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
+        labelEpisodeNameLang->setText(QApplication::translate("ShikiRenameClass", "Language", nullptr));
+        checkboxNoSeason->setText(QApplication::translate("ShikiRenameClass", "No season numbers", nullptr));
         labelSeasonNrPrefix->setText(QApplication::translate("ShikiRenameClass", "Prefix Season Number", nullptr));
         buttonCustomFileNameReset->setText(QApplication::translate("ShikiRenameClass", "Reset", nullptr));
+        labelSeasonNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
+        labelEpisodeNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
+        labelName->setText(QApplication::translate("ShikiRenameClass", "Name", nullptr));
         editSeasonNrDigits->setText(QString());
         editSeasonNrDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "2", nullptr));
-        editEpisodeNrDigits->setText(QString());
-        editEpisodeNrDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "2", nullptr));
-        checkboxNoSeason->setText(QApplication::translate("ShikiRenameClass", "No season numbers", nullptr));
+        checkboxCustomFileName->setText(QApplication::translate("ShikiRenameClass", "Customize File Name", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ShikiRenameClass", "Movies / Episodes", nullptr));
         menuFile->setTitle(QApplication::translate("ShikiRenameClass", "File", nullptr));
         menuEdit->setTitle(QApplication::translate("ShikiRenameClass", "Edit", nullptr));

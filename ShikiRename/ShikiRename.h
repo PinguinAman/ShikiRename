@@ -59,13 +59,6 @@ public:
 	void on_checkboxNoSeason_toggled(const bool &checked);
 	void on_comboEpisodeNameSrc_currentIndexChanged(const int &index);
 	void on_comboEpisodeNameLang_currentIndexChanged(const int &index);
-	void on_editYear_textChanged(const QString &arg1);
-	void on_editLang_textChanged(const QString &arg1);
-	void on_editAudio_textChanged(const QString &arg1);
-	void on_editResolution_textChanged(const QString &arg1);
-	void on_editVideo_textChanged(const QString &arg1);
-	void on_editSource_textChanged(const QString &arg1);
-	void on_editSceneGrp_textChanged(const QString &arg1);
 
 	void on_checkboxOnlySelected_toggled(const bool &checked);
 	void on_currentList_itemSelectionChanged();
@@ -157,13 +150,6 @@ private:
 	bool input_vid_noSeason = false;
 	MetaDB input_vid_eNameSrc;
 	QString input_vid_eNameLang = "en";
-	QString input_vid_releaseYear;
-	QString input_vid_language;
-	QString input_vid_audio;
-	QString input_vid_videoResolution;
-	QString input_vid_video;
-	QString input_vid_src;
-	QString input_vid_sceneGrp;
 	QString releaseDataSuffix;
 	bool input_epDetection = false;
 	bool ongoingSeriesSelection = false;
