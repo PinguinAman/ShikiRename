@@ -118,7 +118,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->buttonRename->setDisabled(true);
 
 	//Multithreaded
-	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcher_finished()));
+	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcherFW_finished()));
 	connect(&previewFW, SIGNAL(finished()), this, SLOT(on_renamePreview_finished()));
 
 	//Network requests
@@ -415,7 +415,7 @@ void ShikiRename::open(QDir dir) {
 /**
  * Restarts the directory watcher if it finished after detecting a change
  */
-void ShikiRename::on_dirWatcher_finished() {
+void ShikiRename::on_dirWatcherFW_finished() {
 	if (dirWatcherFW.result() == 0) {
 		qDebug() << "Restarting DirWatcher...";
 		this->open(curDir);

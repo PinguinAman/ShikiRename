@@ -76,7 +76,7 @@ private slots:
 	void openDialogSeriesSelection(QJsonArray seriesData);
 	void on_seriesSelectedDialog_closed(const int &id, const QString &name);
 
-	void on_dirWatcher_finished();
+	void on_dirWatcherFW_finished();
 
 	void watchFileChanges();
 	void handleNetworkReply(QNetworkReply* reply);
