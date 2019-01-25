@@ -30,7 +30,7 @@ public:
 	explicit ShikiRename(QWidget *parent = 0);
 	~ShikiRename();
 
-	private slots:
+private slots:
 	void on_tabWidget_currentChanged(const int &index);
 	void on_editDirectory_returnPressed();
 
@@ -63,6 +63,7 @@ public:
 
 	void on_checkboxOnlySelected_toggled(const bool &checked);
 	void on_currentList_itemSelectionChanged();
+	void on_renamePreview_finished();
 
 	void on_actionOpen_triggered();
 	void on_actionRefresh_triggered();
@@ -74,6 +75,8 @@ public:
 
 	void openDialogSeriesSelection(QJsonArray seriesData);
 	void on_seriesSelectedDialog_closed(const int &id, const QString &name);
+
+	void on_dirWatcher_finished();
 
 	void watchFileChanges();
 	void handleNetworkReply(QNetworkReply* reply);
@@ -102,6 +105,7 @@ private:
 
 	void open(QDir dir);
 	void addToHistory(int id, QString o, QString n);
+	void buildPreview();
 	void previewRename();
 	void cacheMediaInfo(QFileInfo fileInfo);
 
@@ -156,6 +160,7 @@ private:
 	QString releaseDataSuffix;
 	bool input_epDetection = false;
 	bool ongoingSeriesSelection = false;
+	QFutureWatcher<void> previewFW;
 	QFutureWatcher<int> dirWatcherFW;
 	QNetworkAccessManager *manager;
 	QByteArray tvdbAuthToken;

@@ -89,6 +89,9 @@
     <CustomBuild Include="RenameConfirmationDialog.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="DirWatcher.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_ShikiRename.h">
@@ -101,9 +104,6 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="MediaInfoDLL\MediaInfoDLL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DirWatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

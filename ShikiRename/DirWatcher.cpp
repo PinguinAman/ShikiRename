@@ -3,7 +3,7 @@
 #include <QDebug>
 
 DirWatcher::DirWatcher(){
-	//aborts current directory watch
+	//event for aborting current directory watch
 	watchCancelEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 }
 
@@ -11,7 +11,7 @@ void DirWatcher::cancel() {
 	SetEvent(watchCancelEvent);    // signal stop event
 }
 
-int DirWatcher::watchDirectory(LPTSTR lpDir) {
+int DirWatcher::watch(LPTSTR lpDir) {
 	TCHAR lpDrive[4];
 	TCHAR lpFile[_MAX_FNAME];
 	TCHAR lpExt[_MAX_EXT];
@@ -21,11 +21,11 @@ int DirWatcher::watchDirectory(LPTSTR lpDir) {
 
 	DWORD watchStatus;
 	HANDLE watchHandles[2];
-	// Watch the directory for file creation and deletion. 
+	// Watch the directory
 	watchHandles[0] = FindFirstChangeNotification(
 		lpDir,                         // directory to watch 
 		FALSE,                         // do not watch subtree 
-		FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE); // watch file name changes 
+		FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_DIR_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE); // watch these events
 	watchHandles[1] = watchCancelEvent;
 
 	if (watchHandles[0] == INVALID_HANDLE_VALUE)
@@ -62,7 +62,7 @@ int DirWatcher::watchDirectory(LPTSTR lpDir) {
 		case (WAIT_OBJECT_0 + 1):
 			qDebug() << "DirWatcher - Aborted by function call";
 			ResetEvent(watchCancelEvent);
-			return 0;
+			return 2;
 		default:
 			qDebug() << "DirWatcher - ERROR: Unhandled dwWaitStatus.";
 			ExitProcess(GetLastError());

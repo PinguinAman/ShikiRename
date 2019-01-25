@@ -117,8 +117,9 @@ ShikiRename::ShikiRename(QWidget *parent) :
 
 	ui->buttonRename->setDisabled(true);
 
-	//Multithread
-	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_actionRefresh_triggered()));	//restarts the directory watcher checking for the next file change
+	//Multithreaded
+	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcher_finished()));
+	connect(&previewFW, SIGNAL(finished()), this, SLOT(on_renamePreview_finished()));
 
 	//Network requests
 	manager = new QNetworkAccessManager(this);
@@ -412,6 +413,15 @@ void ShikiRename::open(QDir dir) {
 }
 
 /**
+ * Restarts the directory watcher if it finished after detecting a change
+ */
+void ShikiRename::on_dirWatcher_finished() {
+	if (dirWatcherFW.result() == 0) {
+		qDebug() << "Restarting DirWatcher...";
+		this->open(curDir);
+	}
+}
+/**
  * Starts watching the current working directory for any file changes
  */
 void ShikiRename::watchFileChanges() {
@@ -430,7 +440,7 @@ void ShikiRename::watchFileChanges() {
 	wchar_t* winDir = new wchar_t[curDir.length() + 1];
 	curDir.toWCharArray(winDir);	//convert path to wchar
 	winDir[curDir.length()] = 0;	//null termination
-	QFuture<int> future = QtConcurrent::run(&this->dirWatcher, &DirWatcher::watchDirectory, winDir); //starts the DirWatcher in another thread
+	QFuture<int> future = QtConcurrent::run(&this->dirWatcher, &DirWatcher::watch, winDir); //starts the DirWatcher in another thread
 	dirWatcherFW.setFuture(future);
 }
 
@@ -511,7 +521,14 @@ void ShikiRename::on_actionRedo_triggered()
 void ShikiRename::addToHistory(int id, QString o, QString n) {
 	hist_undo.push_back(std::make_tuple(id, o, n));
 }
+void ShikiRename::on_renamePreview_finished() {
+	return;
+}
 void ShikiRename::previewRename() {
+	QFuture<void> future = QtConcurrent::run(this, &ShikiRename::buildPreview);
+}
+void ShikiRename::buildPreview() {
+	ui->tabWidget->setEnabled(false);
 	QMutableListIterator<QFileInfo> it(infoList);
 	int cur_num = input_num_init;							//keeps track of our current number for the consecutive numeration operation
 	ui->renamePreview->clear();
@@ -525,7 +542,7 @@ void ShikiRename::previewRename() {
 
 			selected = true;
 			if (ui->tabWidget->currentIndex() == 0) {
-				//Remove left operation
+				//Remove left
 				if (input_remLeft > 0)
 					v = v.remove(0, input_remLeft);
 
@@ -609,16 +626,17 @@ void ShikiRename::previewRename() {
 					.replace(QString("<EPISODE ABSOLUTE>"), this->zerofy(episodeAbsolute, input_vid_eDigits))
 					.replace(QString("<EPISODE NAME>"), episodeName)
 					.replace(QString("<YEAR>"), episodeYear)
-					.replace(QString("<LANGUAGE>"), "")
-					.replace(QString("<AUDIO>"), "")
+					.replace(QString("<LANGUAGE>"), mediaInfoCache[filePath]["language"])
+					.replace(QString("<AUDIO>"), mediaInfoCache[filePath]["aCodec"])
 					.replace(QString("<RESOLUTION>"), mediaInfoCache[filePath]["resolution"])
 					.replace(QString("<SOURCE>"), "")
-					.replace(QString("<VIDEO>"), mediaInfoCache[filePath]["codec"])
+					.replace(QString("<VIDEO>"), mediaInfoCache[filePath]["vCodec"])
 					.replace(QString("<SCENE GROUP>"), "");
 				v.remove(rgx_invalidFnCharset_win);
 			}
 		}
 		QString fullFilename = v % QChar('.') % it.value().suffix();
+
 		QListWidgetItem* qListWidgetItem = new QListWidgetItem(fullFilename);
 		qListWidgetItem->setFlags(Qt::ItemNeverHasChildren);
 		if (selected) {
@@ -628,6 +646,7 @@ void ShikiRename::previewRename() {
 	}
 
 	ui->buttonRename->setEnabled(ui->renamePreview->count() > 0);
+	ui->tabWidget->setEnabled(true);
 }
 
 void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
@@ -647,19 +666,48 @@ void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
 			resolution.append("p");
 		mediaInfo["resolution"] = resolution;
 
-		QString codecID = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("CodecID"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
-		if (codecID.compare("V_MPEG4/ISO/AVC", Qt::CaseInsensitive) == 0) {
-			mediaInfo["codec"] = "x264";
+		QString vCodecID = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("CodecID"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+		if (vCodecID.compare("V_MPEG4/ISO/AVC", Qt::CaseInsensitive) == 0) {
+			mediaInfo["vCodec"] = "x264";
 		}
-		else if (codecID.compare("V_MPEGH/ISO/HEVC", Qt::CaseInsensitive) == 0) {
-			mediaInfo["codec"] = "x265";
+		else if (vCodecID.compare("V_MPEGH/ISO/HEVC", Qt::CaseInsensitive) == 0) {
+			mediaInfo["vCodec"] = "x265";
 		}
-		else if (codecID.compare("XVID", Qt::CaseInsensitive) == 0) {
-			mediaInfo["codec"] = "XviD";
+		else if (vCodecID.compare("XVID", Qt::CaseInsensitive) == 0) {
+			mediaInfo["vCodec"] = "XviD";
+		}
+
+		QString aCodecID = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("CodecID"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+		QString aCodecIDHint = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("CodecID/Hint"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+		aCodecID.append(" " + aCodecIDHint);
+		if (aCodecID.contains("AAC", Qt::CaseInsensitive) == 0) {
+			mediaInfo["aCodec"] = "AAC";
+		}
+		else if (aCodecID.contains("FLAC", Qt::CaseInsensitive) == 0) {
+			mediaInfo["aCodec"] = "FLAC";
+		}
+		else if (aCodecID.contains("DTS", Qt::CaseInsensitive) == 0) {
+			mediaInfo["aCodec"] = "DTS";
+		}
+		else if (aCodecID.contains("AC3", Qt::CaseInsensitive) == 0) {
+			mediaInfo["aCodec"] = "AC3";
+		}
+		else if (aCodecID.contains("MP3", Qt::CaseInsensitive) == 0) {
+			mediaInfo["aCodec"] = "MP3";
 		}
 	}
 
-	qDebug() << "Adding" << fileInfo.absoluteFilePath() << "to mediaInfoCache";
+	QString primaryAudioLang = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("Language/String"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+	QString primarySubLang = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Text, 0, __T("Language/String"), MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+	if (!primaryAudioLang.isEmpty()) {
+		primaryAudioLang = primaryAudioLang.left(3).append("-Dub");
+	}
+	if (!primarySubLang.isEmpty()) {
+		primarySubLang = primarySubLang.left(3).append("-Sub");
+	}
+	mediaInfo["language"] = QString(primaryAudioLang + " " + primarySubLang).trimmed();
+
+	//qDebug() << "Adding" << fileInfo.absoluteFilePath() << "to mediaInfoCache";
 	mediaInfoCache[fileInfo.absoluteFilePath()] = mediaInfo;
 }
 
@@ -679,6 +727,9 @@ void ShikiRename::on_buttonRename_clicked()
 	{
 		actionHistoryId = 0;
 	}
+
+	qDebug() << "Disabling dirWatcher";
+	dirWatcher.cancel();
 
 	QStringList targetNames;
 	for (int i = 0; i < ui->renamePreview->count(); i++) {
@@ -718,19 +769,20 @@ void ShikiRename::on_buttonRename_clicked()
 
 	for (int i = 0; i < ui->renamePreview->count(); i++) {
 		if (isSelectedInList(ui->currentList->item(i)->text())) {
-			QString oldName = infoList.at(i).absoluteFilePath();														//original file
-			QString newName = infoList.at(i).absolutePath() % QChar('/') % ui->renamePreview->item(i)->text();		//new file
+			QString oldName = infoList.at(i).absoluteFilePath();	//original file
+			QString newName = infoList.at(i).absolutePath() % QChar('/') % ui->renamePreview->item(i)->text();	//new file
 
 			if (oldName != newName) {
-				if (!QFile::rename(oldName, newName)) {		//rename file
+				if (newName.length() > MAX_PATH) {
+					errorDialog_renameFailed.setInformativeText("Rename failed because Window's Maximum Path Length Limitation (" + QString::number(MAX_PATH) + ") has been exceeded:\n" + newName);
+					errorDialog_renameFailed.exec();
+				} else if (!QFile::rename(oldName, newName)) {	//rename file
 					errorDialog_renameFailed.setInformativeText("Failed to rename \"" % oldName % "\" to \"" % newName % "\"!");
 					errorDialog_renameFailed.exec();
-				}
-				else
-				{
-					this->addToHistory(actionHistoryId, oldName, newName);													//add rename to history
+				} else {
+					this->addToHistory(actionHistoryId, oldName, newName);	//add rename to history
 					if (!ui->actionUndo->isEnabled()) {
-						ui->actionUndo->setEnabled(true);																	//activate undo button in menu bar
+						ui->actionUndo->setEnabled(true);	//activate undo button in menu bar
 					}
 				}
 			}
@@ -739,7 +791,6 @@ void ShikiRename::on_buttonRename_clicked()
 
 	QDir dir = QDir(infoList.first().absolutePath() + QString("\\"));
 	this->open(dir);	//reload everything so it shows the new current state of the files
-	this->previewRename();
 }
 
 QString ShikiRename::zerofy(QString string, int digits) {

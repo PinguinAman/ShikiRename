@@ -9,6 +9,6 @@ private:
 	HANDLE watchCancelEvent;
 public:
 	DirWatcher();
-	int watchDirectory(LPTSTR);
+	int watch(LPTSTR);
 	void cancel();
 };
