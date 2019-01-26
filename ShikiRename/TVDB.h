@@ -28,11 +28,11 @@ public:
 	void requestEpisodes(int seriesId, int page);
 
 signals:
-	void openDialogSeriesSelection(QJsonArray);
+	void receivedSeriesData(QJsonArray);
 	void receivedLanguageList(QStringList);
 	void authTimeoutSignal();
-	void loggedIn();
-	void episodeDataReceived();
+	void receivedAuthToken();
+	void receivedEpisodesData();
 
 private slots:
 	void authTimeout();

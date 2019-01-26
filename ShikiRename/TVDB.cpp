@@ -182,7 +182,7 @@ void TVDB::handleNetworkReply(QNetworkReply* reply) {
 		if (!tvdbAuthToken.isEmpty() && !tvdbAuthToken.isNull()) {
 			tvdbAuthTimer->stop();
 			qDebug() << "TVDB - Login confirmed";
-			emit loggedIn();
+			emit receivedAuthToken();
 		}
 	}
 	else if (replyType == "languages") {
@@ -202,7 +202,7 @@ void TVDB::handleNetworkReply(QNetworkReply* reply) {
 	else if (replyType == "series") {
 		QJsonArray data = json.value("data").toArray();
 		if (!data.isEmpty()) {
-			emit openDialogSeriesSelection(data);
+			emit receivedSeriesData(data);
 		}
 		else {
 			QMessageBox errorDialog_seriesNotFound;
@@ -237,7 +237,7 @@ void TVDB::handleNetworkReply(QNetworkReply* reply) {
 		}
 		else {
 			qDebug() << "TVDB - Finished receiving episode data";
-			emit episodeDataReceived();
+			emit receivedEpisodesData();
 		}
 	}
 }

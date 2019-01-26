@@ -122,12 +122,12 @@ ShikiRename::ShikiRename(QWidget *parent) :
 
 	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
 	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
-	connect(&tvdb, SIGNAL(openDialogSeriesSelection(QJsonArray)), seriesSelectionDialog, SLOT(setData(QJsonArray)));
-	connect(&tvdb, SIGNAL(openDialogSeriesSelection(QJsonArray)), seriesSelectionDialog, SLOT(show()));
+	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(setData(QJsonArray)));
+	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(show()));
 	connect(&tvdb, SIGNAL(receivedLanguageList(QStringList)), this, SLOT(comboEpisodeNameLang_addItems(QStringList)));
 	connect(&tvdb, SIGNAL(authTimeoutSignal()), this, SLOT(on_tvdb_authTimeout()));
-	connect(&tvdb, SIGNAL(loggedIn()), this, SLOT(on_tvdb_loggedIn()));
-	connect(&tvdb, SIGNAL(episodeDataReceived()), this, SLOT(previewRename()));
+	connect(&tvdb, SIGNAL(receivedAuthToken()), this, SLOT(on_tvdb_loggedIn()));
+	connect(&tvdb, SIGNAL(receivedEpisodesData()), this, SLOT(previewRename()));
 	//Multithreaded
 	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcherFW_finished()));
 	connect(&previewFW, SIGNAL(finished()), this, SLOT(on_renamePreview_finished()));
