@@ -66,6 +66,15 @@
     <ClCompile Include="DirWatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TVDB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_TVDB.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_TVDB.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ShikiRename.h">
@@ -90,6 +99,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="DirWatcher.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TVDB.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

@@ -16,6 +16,7 @@
 #include <regex>
 #include "MediaInfoDLL/MediaInfoDLL.h" //Dynamicly-loaded library (.dll or .so)
 #include <DirWatcher.h>
+#include <TVDB.h>
 
 namespace Ui {
 	class ShikiRenameClass;
@@ -26,6 +27,7 @@ class ShikiRename : public QMainWindow
 	Q_OBJECT
 
 public:
+	const enum MetaDB { None = 0, TheTVDB = 1 };
 	const int MAX_INT = (std::numeric_limits<int>::max)();
 	explicit ShikiRename(QWidget *parent = 0);
 	~ShikiRename();
@@ -60,7 +62,7 @@ private slots:
 	void on_checkboxNoSeason_toggled(const bool &checked);
 	void on_comboEpisodeNameSrc_currentIndexChanged(const int &index);
 	void on_comboEpisodeNameLang_currentIndexChanged(const int &index);
-
+	void comboEpisodeNameLang_addItems(QStringList items);
 	void on_checkboxOnlySelected_toggled(const bool &checked);
 	void on_currentList_itemSelectionChanged();
 	void on_renamePreview_finished();
@@ -77,11 +79,13 @@ private slots:
 	void on_seriesSelectedDialog_closed(const int &id, const QString &name);
 
 	void on_dirWatcherFW_finished();
-
 	void watchFileChanges();
-	void handleNetworkReply(QNetworkReply* reply);
-	void tvdbAuthError();
-	void tvdbFindSeries(QString name);
+
+	void findSeries();
+	void previewRename();
+
+	void on_tvdb_authTimeout();
+	void on_tvdb_loggedIn();
 
 private:
 	Ui::ShikiRenameClass *ui;
@@ -89,8 +93,6 @@ private:
 	RenameConfirmationDialog *renameConfirmationDialog;
 
 	const QString DEFAULT_MEDIA_FILENAME_STRUCTURE = "<NAME> - <SEASON PREFIX><SEASON><EPISODE PREFIX><EPISODE> - [<EPISODE ABSOLUTE>] <EPISODE NAME> - [<YEAR> <LANGUAGE> <AUDIO> <RESOLUTION> <SOURCE> <VIDEO> - <SCENE GROUP>]";
-	const enum MetaDB { None = 0, TheTVDB = 1 };
-	const int TVDB_TIMEOUT = 20000;	//ms
 	QString invalidFnCharset_win;
 	QStringList fileTypes_video;
 
@@ -106,7 +108,6 @@ private:
 	void open(QDir dir);
 	void addToHistory(int id, QString o, QString n);
 	void buildPreview();
-	void previewRename();
 	void cacheMediaInfo(QFileInfo fileInfo);
 
 	QString zerofy(QString string, int digits);
@@ -117,12 +118,8 @@ private:
 
 	bool onlineDbAvailable();
 
-	void tvdbAuth();
-	void tvdbAuthorizeRequest(QNetworkRequest *request);
-	void tvdbFindEpisodes(int seriesId, int page);
-	void tvdbGetLanguages();
-
 	DirWatcher dirWatcher;
+	TVDB tvdb;
 	QString curDir = "";
 	QFileInfoList infoList;
 	QStringList filenames;
@@ -162,15 +159,7 @@ private:
 	bool ongoingSeriesSelection = false;
 	QFutureWatcher<void> previewFW;
 	QFutureWatcher<int> dirWatcherFW;
-	QNetworkAccessManager *manager;
-	QByteArray tvdbAuthToken;
-	QTimer *tvdbAuthTimer;
-	std::list<std::pair<QString, QString>> tvdbLanguages;
 	QTimer *tvdbSearchDelayTimer;
-
-	QJsonArray episodeData;
-
-
 };
 
 #endif // SHIKIRENAME_H

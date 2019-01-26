@@ -19,12 +19,13 @@ public:
 	explicit SeriesSelectionDialog(QWidget *parent);
 	~SeriesSelectionDialog();
 
-	void setData(QJsonArray seriesData);
-
-	signals:
+signals:
 	void closed(int id, QString name);
 
-	private slots:
+public slots:
+	void setData(QJsonArray seriesData);
+
+private slots:
 	void on_buttonOK_clicked();
 	void on_buttonCancel_clicked();
 

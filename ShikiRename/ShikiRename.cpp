@@ -25,14 +25,19 @@ ShikiRename::ShikiRename(QWidget *parent) :
 {
 	ui->setupUi(this);
 	ui->tab_2_gridLayout->setGeometry(ui->tab_2->geometry());
-
 	ui->buttonOpen->setIcon(QIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon)));
-	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
 	ui->editDirectory->setPlaceholderText("<directory>");
-
 	//Filename lists
 	ui->currentList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	ui->renamePreview->setSelectionMode(QAbstractItemView::NoSelection);
+	//initial states
+	ui->actionUndo->setEnabled(false);
+	ui->actionRedo->setEnabled(false);
+	ui->actionUndo->setShortcut(tr("CTRL+Z"));
+	ui->actionRedo->setShortcut(tr("CTRL+Y"));
+	ui->actionRefresh->setDisabled(true);
+	ui->buttonRename->setDisabled(true);
+
 
 	invalidFnCharset_win = QString(R"(\/:*?"<>|)");	//charset of invalid Windows filename characters
 	QRegExp rgx_validFnCharset_win = QRegExp(QString("[^") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
@@ -67,12 +72,12 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	QString tt_ENABS = "Absolute episode numbers (Total episodes, not divided into seasons)";
 	QString tt_GEPNR = "Tries to find the episode number without a season number. Uses the first found number while ignoring repeating filename patterns.";
 	QString tt_ENAME = "Name of the episodes (provided by the selected source)";
-	QString tt_RYEAR = "Year the series (or season) started";
-	QString tt_SLANG = "Primary language of the release, possibly subtitle language if important (e.g. <i>German</i> or <i>Japanese Dubbed German Subbed</i> or <i>JAP-Dub GER-Sub</i>)";
-	QString tt_AUDIO = "Primary audio codec (e.g. <i>DTS</i> or <i>AC3</i>)";
-	QString tt_RESOL = "Video resolution (e.g. <i>1080p</i> or <i>720p</i>)";
-	QString tt_SOURC = "Primary source of the release (usually refers to video source) (e.g. <i>BluRay</i> or <i>HDDVD</i>)";
-	QString tt_VIDEO = "Used video codec (e.g. <i>x264</i> or <i>XViD</i>)";
+	QString tt_RYEAR = "Year the episode aired (provided by the selected source)";
+	QString tt_SLANG = "Primary audio language, subtitle language if available (formatted e.g. <i>Jap-Dub Ger-Sub</i>) (scanned from file)";
+	QString tt_AUDIO = "Primary audio codec (e.g. <i>DTS</i> or <i>AC3</i>) (scanned from file)";
+	QString tt_RESOL = "Video resolution (e.g. <i>1080p</i> or <i>720p</i>) (scanned from file)";
+	QString tt_SOURC = "Primary source of the release (usually refers to video source) (e.g. <i>BluRay</i>, <i>HDDVD</i> or <i>TVRip</i>)";
+	QString tt_VIDEO = "Used video codec (e.g. <i>x264</i> or <i>XViD</i>) (scanned from file)";
 	QString tt_GROUP = "The scene group providing this release (obviously refers to pirated copies)";
 	QString tt_CNAME = QString("Schema of the target file names. Default is setup to work with Plex. <p>Available tags:</p>")
 		% QString("<b>&lt;NAME&gt;</b> - ") % tt_SNAME
@@ -96,7 +101,6 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->editName->setValidator(WIN_INVALID_FN);
 	ui->editName->setToolTip(tt_SNAME);
 	ui->comboEpisodeNameSrc->setToolTip(tt_EPNSS);
-	ui->comboEpisodeNameLang->addItem("");
 	ui->comboEpisodeNameLang->setToolTip(tt_EPNLS);
 	ui->editSeasonNrPrefix->setValidator(WIN_INVALID_FN);
 	ui->editSeasonNrPrefix->setToolTip(tt_SPREF);
@@ -108,33 +112,25 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->editEpisodeNrDigits->setToolTip(tt_ENUMB);
 	ui->checkboxNoSeason->setToolTip(tt_GEPNR);
 
-	//Menubar
-	ui->actionUndo->setEnabled(false);
-	ui->actionRedo->setEnabled(false);
-	ui->actionUndo->setShortcut(tr("CTRL+Z"));
-	ui->actionRedo->setShortcut(tr("CTRL+Y"));
-	ui->actionRefresh->setDisabled(true);
-
-	ui->buttonRename->setDisabled(true);
-
-	//Multithreaded
-	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcherFW_finished()));
-	connect(&previewFW, SIGNAL(finished()), this, SLOT(on_renamePreview_finished()));
-
-	//Network requests
-	manager = new QNetworkAccessManager(this);
-	connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(handleNetworkReply(QNetworkReply*)));
-	this->tvdbAuth();
-
 	//Don't search for every character input, but wait till the user stops typing.
 	tvdbSearchDelayTimer = new QTimer(this);
 	tvdbSearchDelayTimer->setSingleShot(true);
-	connect(tvdbSearchDelayTimer, &QTimer::timeout, this, [this] { tvdbFindSeries(input_vid_name); });	//https://stackoverflow.com/a/22411267
+	connect(tvdbSearchDelayTimer, &QTimer::timeout, this, [this] { findSeries(); });	//https://stackoverflow.com/a/22411267
 
 	seriesSelectionDialog = new SeriesSelectionDialog(this);
-	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
-
 	renameConfirmationDialog = new RenameConfirmationDialog(this);
+
+	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
+	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
+	connect(&tvdb, SIGNAL(openDialogSeriesSelection(QJsonArray)), seriesSelectionDialog, SLOT(setData(QJsonArray)));
+	connect(&tvdb, SIGNAL(openDialogSeriesSelection(QJsonArray)), seriesSelectionDialog, SLOT(show()));
+	connect(&tvdb, SIGNAL(receivedLanguageList(QStringList)), this, SLOT(comboEpisodeNameLang_addItems(QStringList)));
+	connect(&tvdb, SIGNAL(authTimeoutSignal()), this, SLOT(on_tvdb_authTimeout()));
+	connect(&tvdb, SIGNAL(loggedIn()), this, SLOT(on_tvdb_loggedIn()));
+	connect(&tvdb, SIGNAL(episodeDataReceived()), this, SLOT(previewRename()));
+	//Multithreaded
+	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcherFW_finished()));
+	connect(&previewFW, SIGNAL(finished()), this, SLOT(on_renamePreview_finished()));
 
 }
 ShikiRename::~ShikiRename()
@@ -344,7 +340,7 @@ void ShikiRename::on_comboEpisodeNameSrc_currentIndexChanged(const int &index)
 	input_vid_eNameSrc = MetaDB(index);
 	switch (index) {
 	case 1:
-		if (onlineDbAvailable()) {
+		if (!input_vid_name.isEmpty() && onlineDbAvailable()) {
 			tvdbSearchDelayTimer->start(1000);
 			break;	//else default
 		}
@@ -353,20 +349,30 @@ void ShikiRename::on_comboEpisodeNameSrc_currentIndexChanged(const int &index)
 		this->previewRename();
 	}
 }
+
 void ShikiRename::on_comboEpisodeNameLang_currentIndexChanged(const int &index)
 {
 	QString selectedLang = ui->comboEpisodeNameLang->itemText(index);
-	for (auto item : tvdbLanguages) {
+	tvdb.setRequestLanguage(selectedLang);
+	for (auto item : tvdb.getLanguages()) {
 		if (item.first == selectedLang && input_vid_eNameLang != item.second) {	//long name equals selected long name & short name is not already selected
 			input_vid_eNameLang = item.second;
-			if (onlineDbAvailable()) {
+			tvdb.setRequestLanguage(input_vid_eNameLang);
+			if (!input_vid_name.isEmpty() && onlineDbAvailable()) {
 				tvdbSearchDelayTimer->start(1000);
 			}
 			break;
 		}
 	}
 }
-
+void ShikiRename::comboEpisodeNameLang_addItems(QStringList items) {
+	qDebug() << "Filling language list: " << items;
+	ui->comboEpisodeNameLang->addItems(items);
+	int defaultIdx = ui->comboEpisodeNameLang->findText("English");
+	if (defaultIdx >= 0) {
+		ui->comboEpisodeNameLang->setCurrentIndex(defaultIdx);
+	}
+}
 void ShikiRename::on_checkboxOnlySelected_toggled(const bool &checked)
 {
 	input_onlySelected = checked;
@@ -532,7 +538,8 @@ void ShikiRename::buildPreview() {
 	QMutableListIterator<QFileInfo> it(infoList);
 	int cur_num = input_num_init;							//keeps track of our current number for the consecutive numeration operation
 	ui->renamePreview->clear();
-
+	QJsonArray episodeData = tvdb.getEpisodeData();
+	qDebug() << "buildPreview() fetched episodeData:\n" << episodeData;
 	while (it.hasNext())									//iterates through every file
 	{
 		bool selected = false;
@@ -776,10 +783,12 @@ void ShikiRename::on_buttonRename_clicked()
 				if (newName.length() > MAX_PATH) {
 					errorDialog_renameFailed.setInformativeText("Rename failed because Window's Maximum Path Length Limitation (" + QString::number(MAX_PATH) + ") has been exceeded:\n" + newName);
 					errorDialog_renameFailed.exec();
-				} else if (!QFile::rename(oldName, newName)) {	//rename file
+				}
+				else if (!QFile::rename(oldName, newName)) {	//rename file
 					errorDialog_renameFailed.setInformativeText("Failed to rename \"" % oldName % "\" to \"" % newName % "\"!");
 					errorDialog_renameFailed.exec();
-				} else {
+				}
+				else {
 					this->addToHistory(actionHistoryId, oldName, newName);	//add rename to history
 					if (!ui->actionUndo->isEnabled()) {
 						ui->actionUndo->setEnabled(true);	//activate undo button in menu bar
@@ -874,172 +883,36 @@ void ShikiRename::on_seriesSelectedDialog_closed(const int &id, const QString &n
 		ongoingSeriesSelection = true;
 		ui->editName->setText(name);
 		ongoingSeriesSelection = false;
-		this->tvdbFindEpisodes(id, 1);
+		tvdb.requestEpisodes(id, 1);
 	}
 }
 
-void ShikiRename::handleNetworkReply(QNetworkReply* reply) {
-	std::string requestUrl = reply->request().url().toString().toStdString();
-	std::regex rgx_replyType(R"(api\.thetvdb\.com\/(?:\w+\/)?(?:\d+\/)?(\w+))");
-	std::smatch match_replyType;
-	QString replyType;
-
-	if (std::regex_search(requestUrl, match_replyType, rgx_replyType)) {
-		replyType = QString::fromStdString(match_replyType.str(1));
-	}
-	QJsonObject json = QJsonDocument::fromJson(reply->readAll()).object();
-	qDebug() << "json: " << json;
-
-	if (replyType == "login") {
-		tvdbAuthToken = json.value("token").toVariant().toByteArray();
-		if (!tvdbAuthToken.isEmpty() && !tvdbAuthToken.isNull()) {
-			tvdbAuthTimer->stop();
-			ui->comboEpisodeNameSrc->setCurrentIndex(MetaDB::TheTVDB);
-			if (ui->comboEpisodeNameLang->count() <= 1) {
-				this->tvdbGetLanguages();
-			}
-		}
-	}
-	else if (replyType == "languages") {
-		QJsonArray data = json.value("data").toArray();
-		for (auto item : data) {
-			QJsonObject jo = item.toObject();
-			std::pair<QString, QString> lang_name = std::make_pair(jo.value("englishName").toString(), jo.value("abbreviation").toString());
-			tvdbLanguages.push_back(lang_name);
-		}
-		tvdbLanguages.sort();
-		for (auto item : tvdbLanguages) {
-			ui->comboEpisodeNameLang->addItem(item.first);
-		}
-	}
-	else if (replyType == "series") {
-		QJsonArray data = json.value("data").toArray();
-		if (!data.isEmpty()) {
-			this->openDialogSeriesSelection(data);
-		}
-		else {
-			QMessageBox errorDialog_seriesNotFound;
-			errorDialog_seriesNotFound.setText("<b>Series not found!</b>");
-			errorDialog_seriesNotFound.setInformativeText(QString("Episode names won't be available.\nTheTVDB.com reports: \"") % json.value("Error").toString() % QChar('"'));
-			errorDialog_seriesNotFound.setIcon(QMessageBox::Warning);
-			errorDialog_seriesNotFound.setWindowTitle(this->windowTitle() % " - Series not found!");
-			errorDialog_seriesNotFound.exec();
-		}
-	}
-	else if (replyType == "episodes") {
-		QJsonArray data = json.value("data").toArray();
-		int seasonId = -1;
-		int page = -1;
-		std::regex rgx_seasonId_page(R"(series\/(\d+)\/episodes\/query\?page\=(\d+))");
-		std::smatch match_seasonId_page;
-
-		if (std::regex_search(requestUrl, match_seasonId_page, rgx_seasonId_page)) {
-			seasonId = std::stoi(match_seasonId_page.str(1));
-			page = std::stoi(match_seasonId_page.str(2));
-		}
-		if (episodeData.empty() || page == 1) {
-			episodeData = data;
-		}
-		else {
-			for (auto item : data) {
-				episodeData.append(item);
-			}
-		}
-		if (episodeData.count() % 100 == 0) {
-
-			this->tvdbFindEpisodes(seasonId, page + 1);
-
-		}
-		else {
-			previewRename();
-		}
-
-	}
-}
 bool ShikiRename::onlineDbAvailable() {
-	if (input_vid_eNameSrc == MetaDB::TheTVDB && !tvdbAuthToken.isEmpty() && !tvdbAuthToken.isNull())
+	if (input_vid_eNameSrc == MetaDB::TheTVDB && tvdb.isAvailable())
 		return true;
 
 	qDebug() << "Selected online meta database is not available.";
 	return false;
 }
 
-void ShikiRename::tvdbAuth() {
-	QJsonObject json
-	{
-		{"apikey","2323B61F3A9DA8C8"},
-		{"username","elpingu42"},
-		{"userkey","52EB4C6A3C24B288"}
-	};
-
-	QUrl url("https://api.thetvdb.com/login");
-	QNetworkRequest request(url);
-	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-	manager->post(request, QJsonDocument(json).toJson());
-
-	tvdbAuthTimer = new QTimer(this);
-	tvdbAuthTimer->setSingleShot(true);
-	tvdbAuthTimer->start(TVDB_TIMEOUT);
-	connect(tvdbAuthTimer, SIGNAL(timeout()), this, SLOT(tvdbAuthError()));
-}
-void ShikiRename::tvdbAuthError() {
-	tvdbAuthTimer->stop();
-	if (tvdbAuthToken.isNull()) {
-		qDebug() << "TheTVDB.com Authentification Failure: timed out.";
-		ui->comboEpisodeNameSrc->setEnabled(false);
-		ui->comboEpisodeNameLang->setEnabled(false);
-		ui->comboEpisodeNameSrc->setItemText(1, ui->comboEpisodeNameSrc->itemText(1) + tr(" [CONNECTION FAILED]"));
-		ui->comboEpisodeNameLang->setDisabled(true);
-
-		QMessageBox errorDialog_tvdbAuthFailed;
-		errorDialog_tvdbAuthFailed.setWindowTitle(this->windowTitle() % " - Authentication timed out!");
-		errorDialog_tvdbAuthFailed.setText("<b>Couldn't connect to TheTVDB.com!</b>");
-		errorDialog_tvdbAuthFailed.setInformativeText(QString("Episode names won't be available, as TheTVDB.com seems unreachable."));
-		errorDialog_tvdbAuthFailed.setIcon(QMessageBox::Warning);
-		errorDialog_tvdbAuthFailed.exec();
-	}
-	this->tvdbGetLanguages();
-}
-void ShikiRename::tvdbAuthorizeRequest(QNetworkRequest *request) {
-	request->setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + tvdbAuthToken));
-}
-void ShikiRename::tvdbFindSeries(QString name) {
+void ShikiRename::findSeries() {
 	tvdbSearchDelayTimer->stop();
 	if (!onlineDbAvailable())
 		return;
 
-	if (!name.isNull() && !name.isEmpty()) {
-		QUrl url("https://api.thetvdb.com/search/series");
-		QUrlQuery query;
-		query.addQueryItem("name", name);
-		url.setQuery(query);
-		QNetworkRequest request(url);
-		request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-		tvdbAuthorizeRequest(&request);
-		request.setRawHeader(QByteArray("Accept-Language"), input_vid_eNameLang.toLocal8Bit());
-		manager->get(request);
+	tvdbSearchDelayTimer->stop();
+	tvdb.requestsSeries(input_vid_name);
+}
+
+void ShikiRename::on_tvdb_authTimeout() {
+	ui->comboEpisodeNameSrc->setEnabled(false);
+	ui->comboEpisodeNameLang->setEnabled(false);
+	ui->comboEpisodeNameSrc->setItemText(1, ui->comboEpisodeNameSrc->itemText(1) + tr(" [CONNECTION FAILED]"));
+	ui->comboEpisodeNameLang->setDisabled(true);
+}
+void ShikiRename::on_tvdb_loggedIn() {
+	ui->comboEpisodeNameSrc->setCurrentIndex(MetaDB::TheTVDB);
+	if (ui->comboEpisodeNameLang->count() <= 1) {
+		tvdb.requestLanguages();
 	}
-}
-void ShikiRename::tvdbFindEpisodes(int seriesId, int page) {
-	if (!onlineDbAvailable())
-		return;
-
-	QUrl url("https://api.thetvdb.com/series/" + QString::number(seriesId) + "/episodes/query");
-	QUrlQuery query;
-	query.addQueryItem("page", QString::number(page));
-	url.setQuery(query);
-	QNetworkRequest request(url);
-	request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-	tvdbAuthorizeRequest(&request);
-	request.setRawHeader(QByteArray("Accept-Language"), input_vid_eNameLang.toLocal8Bit());
-	manager->get(request);
-}
-void ShikiRename::tvdbGetLanguages() {
-	if (!onlineDbAvailable())
-		return;
-
-	QUrl url("https://api.thetvdb.com/languages");
-	QNetworkRequest request(url);
-	tvdbAuthorizeRequest(&request);
-	manager->get(request);
 }
