@@ -18,15 +18,20 @@
 #include <QList>
 #include <QMessageBox>
 #include <QWindowStateChangeEvent>
+#include <QtWin>
 
 ShikiRename::ShikiRename(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::ShikiRenameClass)
 {
 	ui->setupUi(this);
-	ui->tab_2_gridLayout->setGeometry(ui->tab_2->geometry());
-	ui->buttonOpen->setIcon(QIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon)));
-	ui->editDirectory->setPlaceholderText("<directory>");
+	ui->horizontalLayout_4->setAlignment(Qt::AlignLeft);
+	ui->horizontalLayout_6->setAlignment(Qt::AlignLeft);
+	ui->horizontalLayout_7->setAlignment(Qt::AlignLeft);
+	ui->horizontalLayout_8->setAlignment(Qt::AlignLeft);
+	ui->horizontalLayout_9->setAlignment(Qt::AlignLeft);
+	ui->horizontalLayout_10->setAlignment(Qt::AlignLeft);
+	ui->verticalLayout->setAlignment(Qt::AlignLeft);
 	//Filename lists
 	ui->currentList->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	ui->renamePreview->setSelectionMode(QAbstractItemView::NoSelection);
@@ -37,6 +42,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->actionRedo->setShortcut(tr("CTRL+Y"));
 	ui->actionRefresh->setDisabled(true);
 	ui->buttonRename->setDisabled(true);
+	ui->buttonLookup->setDisabled(true);
 
 
 	invalidFnCharset_win = QString(R"(\/:*?"<>|)");	//charset of invalid Windows filename characters
@@ -96,6 +102,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 		% QString("<br><b>&lt;SCENE GROUP&gt;</b> - ") % tt_GROUP;
 	////Tooltip setup
 	ui->editCustomFileName->setText(DEFAULT_MEDIA_FILENAME_STRUCTURE);
+	ui->editCustomFileName->setCursorPosition(0);	//prevents the text we just set to be right-aligned when resizing the window
 	ui->editCustomFileName->setEnabled(false);
 	ui->editCustomFileName->setToolTip(tt_CNAME);
 	ui->editName->setValidator(WIN_INVALID_FN);
@@ -113,22 +120,27 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->checkboxNoSeason->setToolTip(tt_GEPNR);
 
 	//Don't search for every character input, but wait till the user stops typing.
-	tvdbSearchDelayTimer = new QTimer(this);
+	/*tvdbSearchDelayTimer = new QTimer(this);
 	tvdbSearchDelayTimer->setSingleShot(true);
-	connect(tvdbSearchDelayTimer, &QTimer::timeout, this, [this] { findSeries(); });	//https://stackoverflow.com/a/22411267
+	connect(tvdbSearchDelayTimer, &QTimer::timeout, this, [this] { findSeries(); });	//https://stackoverflow.com/a/22411267*/
 
 	seriesSelectionDialog = new SeriesSelectionDialog(this);
 	renameConfirmationDialog = new RenameConfirmationDialog(this);
 
 	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
 	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
+	//tvdb communication
 	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(setData(QJsonArray)));
 	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(show()));
 	connect(&tvdb, SIGNAL(receivedLanguageList(QStringList)), this, SLOT(comboEpisodeNameLang_addItems(QStringList)));
 	connect(&tvdb, SIGNAL(authTimeoutSignal()), this, SLOT(on_tvdb_authTimeout()));
 	connect(&tvdb, SIGNAL(receivedAuthToken()), this, SLOT(on_tvdb_loggedIn()));
 	connect(&tvdb, SIGNAL(receivedEpisodesData()), this, SLOT(previewRename()));
-	//Multithreaded
+	//ui changes from worker threads have to be done by signals&slots
+	connect(this, SIGNAL(workingStarts()), this, SLOT(beforePreview()));
+	connect(this, SIGNAL(workingEnds()), this, SLOT(afterPreview()));
+	connect(this, SIGNAL(preview(QListWidgetItem*)), this, SLOT(addToPreview(QListWidgetItem*)));
+	//Multithreading
 	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcherFW_finished()));
 	connect(&previewFW, SIGNAL(finished()), this, SLOT(on_renamePreview_finished()));
 
@@ -156,8 +168,8 @@ void ShikiRename::fixGridLayoutWidth() {
 	newSize1.setHeight(ui->layoutWidget->height());
 	ui->layoutWidget->setGeometry(newSize1);
 	QRect newSize2 = ui->tab_2->geometry();
-	newSize2.setHeight(ui->gridLayoutWidget->height());
-	ui->gridLayoutWidget->setGeometry(newSize2);
+	newSize2.setHeight(ui->verticalLayoutWidget->height());
+	ui->verticalLayoutWidget->setGeometry(newSize2);
 }
 void ShikiRename::on_editDirectory_returnPressed()
 {
@@ -271,6 +283,10 @@ void ShikiRename::on_editNumDigits_textChanged(const QString &arg1)
 		this->previewRename();
 }
 
+void ShikiRename::on_buttonLookup_clicked() {
+	ui->buttonLookup->setDisabled(true);
+	findSeries();
+}
 void ShikiRename::on_buttonCustomFileNameReset_clicked() {
 	ui->editCustomFileName->setText(DEFAULT_MEDIA_FILENAME_STRUCTURE);
 }
@@ -284,16 +300,13 @@ void ShikiRename::on_editCustomFileName_textChanged(const QString &arg1)
 
 	this->previewRename();
 }
-void ShikiRename::on_editName_textChanged(const QString &arg1)
+void ShikiRename::on_editName_textEdited(const QString &arg1)
 {
 	input_vid_name = arg1;
-
-	if (onlineDbAvailable() && !ongoingSeriesSelection) {
-		tvdbSearchDelayTimer->start(1000);
+	if (!input_vid_name.isEmpty()) {
+		ui->buttonLookup->setDisabled(false);
 	}
-	else {
-		this->previewRename();
-	}
+	this->previewRename();
 }
 void ShikiRename::on_editSeasonNrPrefix_textChanged(const QString &arg1)
 {
@@ -338,15 +351,8 @@ void ShikiRename::on_checkboxNoSeason_toggled(const bool &checked) {
 void ShikiRename::on_comboEpisodeNameSrc_currentIndexChanged(const int &index)
 {
 	input_vid_eNameSrc = MetaDB(index);
-	switch (index) {
-	case 1:
-		if (!input_vid_name.isEmpty() && onlineDbAvailable()) {
-			tvdbSearchDelayTimer->start(1000);
-			break;	//else default
-		}
-	case 0:
-	default:
-		this->previewRename();
+	if (!input_vid_name.isEmpty()) {
+		ui->buttonLookup->setDisabled(false);
 	}
 }
 
@@ -358,8 +364,8 @@ void ShikiRename::on_comboEpisodeNameLang_currentIndexChanged(const int &index)
 		if (item.first == selectedLang && input_vid_eNameLang != item.second) {	//long name equals selected long name & short name is not already selected
 			input_vid_eNameLang = item.second;
 			tvdb.setRequestLanguage(input_vid_eNameLang);
-			if (!input_vid_name.isEmpty() && onlineDbAvailable()) {
-				tvdbSearchDelayTimer->start(1000);
+			if (!input_vid_name.isEmpty()) {
+				ui->buttonLookup->setDisabled(false);
 			}
 			break;
 		}
@@ -533,13 +539,27 @@ void ShikiRename::on_renamePreview_finished() {
 void ShikiRename::previewRename() {
 	QFuture<void> future = QtConcurrent::run(this, &ShikiRename::buildPreview);
 }
-void ShikiRename::buildPreview() {
-	ui->tabWidget->setEnabled(false);
-	QMutableListIterator<QFileInfo> it(infoList);
-	int cur_num = input_num_init;							//keeps track of our current number for the consecutive numeration operation
+
+void ShikiRename::beforePreview() {
 	ui->renamePreview->clear();
+	//ui->tabWidget->setEnabled(false);
+}
+
+void ShikiRename::afterPreview() {
+	ui->buttonRename->setEnabled(ui->renamePreview->count() > 0);
+	//ui->tabWidget->setEnabled(true);
+}
+
+void ShikiRename::addToPreview(QListWidgetItem* qListWidgetItem) {
+	ui->renamePreview->addItem(qListWidgetItem);
+}
+
+void ShikiRename::buildPreview() {
+	emit workingStarts();
+	QMutableListIterator<QFileInfo> it(infoList);
 	QJsonArray episodeData = tvdb.getEpisodeData();
-	qDebug() << "buildPreview() fetched episodeData:\n" << episodeData;
+	int cur_num = input_num_init;							//keeps track of our current number for the consecutive numeration operation
+
 	while (it.hasNext())									//iterates through every file
 	{
 		bool selected = false;
@@ -607,7 +627,6 @@ void ShikiRename::buildPreview() {
 					season = 1;
 					ep = this->searchEpisode(v);
 				}
-
 				QString episodeName;
 				QString episodeAbsolute;
 				QString episodeYear;
@@ -643,17 +662,15 @@ void ShikiRename::buildPreview() {
 			}
 		}
 		QString fullFilename = v % QChar('.') % it.value().suffix();
-
 		QListWidgetItem* qListWidgetItem = new QListWidgetItem(fullFilename);
 		qListWidgetItem->setFlags(Qt::ItemNeverHasChildren);
 		if (selected) {
 			qListWidgetItem->setTextColor(Qt::black);
 		}
-		ui->renamePreview->addItem(qListWidgetItem);
+		//ui->renamePreview->addItem(qListWidgetItem);
+		emit preview(qListWidgetItem);
 	}
-
-	ui->buttonRename->setEnabled(ui->renamePreview->count() > 0);
-	ui->tabWidget->setEnabled(true);
+	emit workingEnds();
 }
 
 void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
@@ -880,9 +897,8 @@ void ShikiRename::on_seriesSelectedDialog_closed(const int &id, const QString &n
 		this->previewRename();
 	}
 	else {
-		ongoingSeriesSelection = true;
 		ui->editName->setText(name);
-		ongoingSeriesSelection = false;
+		input_vid_name = name;
 		tvdb.requestEpisodes(id, 1);
 	}
 }
@@ -896,11 +912,9 @@ bool ShikiRename::onlineDbAvailable() {
 }
 
 void ShikiRename::findSeries() {
-	tvdbSearchDelayTimer->stop();
 	if (!onlineDbAvailable())
 		return;
 
-	tvdbSearchDelayTimer->stop();
 	tvdb.requestsSeries(input_vid_name);
 }
 
@@ -915,4 +929,15 @@ void ShikiRename::on_tvdb_loggedIn() {
 	if (ui->comboEpisodeNameLang->count() <= 1) {
 		tvdb.requestLanguages();
 	}
+}
+
+QIcon ShikiRename::loadIcon(int id) {
+	/*
+	for (int i = 0; QtWin::fromHICON(ExtractIconA(GetModuleHandle(NULL), "shell32.dll", i)).save(QDir::currentPath() + "/shell32 icons/" + QString::number(i) + ".png", "png", 100); i++) {
+		qDebug() << "Extracting icon #" << i;
+	}
+	*/
+	//QPixmap icon = QtWin::fromHICON(ExtractIconA(GetModuleHandle(NULL), "shell32.dll", id));
+	QIcon icon = QIcon(":/ShikiRename/shell32icons/" + QString::number(id) + ".png");
+	return icon;
 }

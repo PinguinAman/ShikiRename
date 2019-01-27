@@ -11,6 +11,7 @@
 #include <SeriesSelectionDialog.h>
 #include <RenameConfirmationDialog.h>
 #include <QList>
+#include <QListWidgetItem>
 #include <QTableWidgetItem>
 #include <QJsonArray>
 #include <regex>
@@ -32,7 +33,16 @@ public:
 	explicit ShikiRename(QWidget *parent = 0);
 	~ShikiRename();
 
+signals:
+	void workingStarts();
+	void workingEnds();
+	void preview(QListWidgetItem*);
+
 private slots:
+	void beforePreview();
+	void afterPreview();
+	void addToPreview(QListWidgetItem*);
+
 	void on_tabWidget_currentChanged(const int &index);
 	void on_editDirectory_returnPressed();
 
@@ -51,10 +61,11 @@ private slots:
 	void on_editNumInc_textChanged(const QString &arg1);
 	void on_editNumDigits_textChanged(const QString &arg1);
 
+	void on_buttonLookup_clicked();
 	void on_buttonCustomFileNameReset_clicked();
 	void on_checkboxCustomFileName_toggled(const bool &checked);
 	void on_editCustomFileName_textChanged(const QString &arg1);
-	void on_editName_textChanged(const QString &arg1);
+	void on_editName_textEdited(const QString &arg1);
 	void on_editSeasonNrPrefix_textChanged(const QString &arg1);
 	void on_editEpisodeNrPrefix_textChanged(const QString &arg1);
 	void on_editSeasonNrDigits_textChanged(const QString &arg1);
@@ -159,7 +170,9 @@ private:
 	bool ongoingSeriesSelection = false;
 	QFutureWatcher<void> previewFW;
 	QFutureWatcher<int> dirWatcherFW;
-	QTimer *tvdbSearchDelayTimer;
+	//QTimer *tvdbSearchDelayTimer;
+
+	QIcon loadIcon(int id);
 };
 
 #endif // SHIKIRENAME_H

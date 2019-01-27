@@ -10,6 +10,7 @@
 #define UI_SHIKIRENAME_H
 
 #include <QtCore/QVariant>
+#include <QtGui/QIcon>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
@@ -87,26 +88,39 @@ public:
     QLineEdit *editNumDigits;
     QFrame *line;
     QWidget *tab_2;
-    QWidget *gridLayoutWidget;
-    QGridLayout *tab_2_gridLayout;
-    QLineEdit *editEpisodeNrDigits;
-    QLineEdit *editSeasonNrPrefix;
-    QLineEdit *editEpisodeNrPrefix;
+    QWidget *verticalLayoutWidget;
+    QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout_4;
+    QCheckBox *checkboxCustomFileName;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *buttonCustomFileNameReset;
     QLineEdit *editCustomFileName;
-    QComboBox *comboEpisodeNameLang;
+    QHBoxLayout *horizontalLayout_6;
+    QLabel *labelName;
+    QHBoxLayout *horizontalLayout_2;
+    QPushButton *buttonLookup;
+    QLineEdit *editName;
+    QHBoxLayout *horizontalLayout_7;
+    QLabel *labelSeasonNrPrefix;
+    QHBoxLayout *horizontalLayout_5;
+    QLineEdit *editSeasonNrPrefix;
+    QLabel *labelSeasonNrDigits;
+    QLineEdit *editSeasonNrDigits;
+    QHBoxLayout *horizontalLayout_11;
+    QLabel *labelDUMMY;
+    QCheckBox *checkboxNoSeason;
+    QHBoxLayout *horizontalLayout_8;
+    QLabel *labelEpisodeNrPrefix;
+    QHBoxLayout *horizontalLayout_3;
+    QLineEdit *editEpisodeNrPrefix;
+    QLabel *labelEpisodeNrDigits;
+    QLineEdit *editEpisodeNrDigits;
+    QHBoxLayout *horizontalLayout_9;
     QLabel *labelEpisodeNameSrc;
     QComboBox *comboEpisodeNameSrc;
-    QLabel *labelEpisodeNrPrefix;
+    QHBoxLayout *horizontalLayout_10;
     QLabel *labelEpisodeNameLang;
-    QCheckBox *checkboxNoSeason;
-    QLabel *labelSeasonNrPrefix;
-    QPushButton *buttonCustomFileNameReset;
-    QLineEdit *editName;
-    QLabel *labelSeasonNrDigits;
-    QLabel *labelEpisodeNrDigits;
-    QLabel *labelName;
-    QLineEdit *editSeasonNrDigits;
-    QCheckBox *checkboxCustomFileName;
+    QComboBox *comboEpisodeNameLang;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuEdit;
@@ -116,7 +130,7 @@ public:
     {
         if (ShikiRenameClass->objectName().isEmpty())
             ShikiRenameClass->setObjectName(QString::fromUtf8("ShikiRenameClass"));
-        ShikiRenameClass->resize(1387, 887);
+        ShikiRenameClass->resize(1202, 887);
         actionOpen = new QAction(ShikiRenameClass);
         actionOpen->setObjectName(QString::fromUtf8("actionOpen"));
         actionUndo = new QAction(ShikiRenameClass);
@@ -158,6 +172,9 @@ public:
         buttonOpen->setSizePolicy(sizePolicy);
         buttonOpen->setMinimumSize(QSize(24, 24));
         buttonOpen->setMaximumSize(QSize(24, 24));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/ShikiRename/shell32icons/3.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonOpen->setIcon(icon);
 
         hLayout_Directory->addWidget(buttonOpen);
 
@@ -374,120 +391,255 @@ public:
         tabWidget->addTab(tab_1, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        gridLayoutWidget = new QWidget(tab_2);
-        gridLayoutWidget->setObjectName(QString::fromUtf8("gridLayoutWidget"));
-        gridLayoutWidget->setGeometry(QRect(0, 0, 1071, 131));
-        tab_2_gridLayout = new QGridLayout(gridLayoutWidget);
-        tab_2_gridLayout->setSpacing(6);
-        tab_2_gridLayout->setContentsMargins(11, 11, 11, 11);
-        tab_2_gridLayout->setObjectName(QString::fromUtf8("tab_2_gridLayout"));
-        tab_2_gridLayout->setSizeConstraint(QLayout::SetNoConstraint);
-        tab_2_gridLayout->setContentsMargins(10, 10, 10, 10);
-        editEpisodeNrDigits = new QLineEdit(gridLayoutWidget);
-        editEpisodeNrDigits->setObjectName(QString::fromUtf8("editEpisodeNrDigits"));
+        verticalLayoutWidget = new QWidget(tab_2);
+        verticalLayoutWidget->setObjectName(QString::fromUtf8("verticalLayoutWidget"));
+        verticalLayoutWidget->setGeometry(QRect(2, 3, 474, 210));
+        verticalLayout = new QVBoxLayout(verticalLayoutWidget);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        horizontalLayout_4 = new QHBoxLayout();
+        horizontalLayout_4->setSpacing(6);
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
+        checkboxCustomFileName = new QCheckBox(verticalLayoutWidget);
+        checkboxCustomFileName->setObjectName(QString::fromUtf8("checkboxCustomFileName"));
+        checkboxCustomFileName->setMinimumSize(QSize(150, 0));
+        checkboxCustomFileName->setMaximumSize(QSize(150, 16777215));
 
-        tab_2_gridLayout->addWidget(editEpisodeNrDigits, 3, 3, 1, 1);
+        horizontalLayout_4->addWidget(checkboxCustomFileName);
 
-        editSeasonNrPrefix = new QLineEdit(gridLayoutWidget);
-        editSeasonNrPrefix->setObjectName(QString::fromUtf8("editSeasonNrPrefix"));
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        buttonCustomFileNameReset = new QPushButton(verticalLayoutWidget);
+        buttonCustomFileNameReset->setObjectName(QString::fromUtf8("buttonCustomFileNameReset"));
+        sizePolicy.setHeightForWidth(buttonCustomFileNameReset->sizePolicy().hasHeightForWidth());
+        buttonCustomFileNameReset->setSizePolicy(sizePolicy);
+        buttonCustomFileNameReset->setMinimumSize(QSize(24, 24));
+        buttonCustomFileNameReset->setMaximumSize(QSize(24, 24));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/ShikiRename/shell32icons/297.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonCustomFileNameReset->setIcon(icon1);
 
-        tab_2_gridLayout->addWidget(editSeasonNrPrefix, 2, 1, 1, 1);
+        horizontalLayout->addWidget(buttonCustomFileNameReset);
 
-        editEpisodeNrPrefix = new QLineEdit(gridLayoutWidget);
-        editEpisodeNrPrefix->setObjectName(QString::fromUtf8("editEpisodeNrPrefix"));
-
-        tab_2_gridLayout->addWidget(editEpisodeNrPrefix, 3, 1, 1, 1);
-
-        editCustomFileName = new QLineEdit(gridLayoutWidget);
+        editCustomFileName = new QLineEdit(verticalLayoutWidget);
         editCustomFileName->setObjectName(QString::fromUtf8("editCustomFileName"));
+        QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(0);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(editCustomFileName->sizePolicy().hasHeightForWidth());
+        editCustomFileName->setSizePolicy(sizePolicy2);
+        editCustomFileName->setMinimumSize(QSize(281, 0));
+        editCustomFileName->setSizeIncrement(QSize(0, 0));
 
-        tab_2_gridLayout->addWidget(editCustomFileName, 0, 1, 1, 3);
+        horizontalLayout->addWidget(editCustomFileName);
 
-        comboEpisodeNameLang = new QComboBox(gridLayoutWidget);
-        comboEpisodeNameLang->setObjectName(QString::fromUtf8("comboEpisodeNameLang"));
 
-        tab_2_gridLayout->addWidget(comboEpisodeNameLang, 4, 3, 1, 2);
+        horizontalLayout_4->addLayout(horizontalLayout);
 
-        labelEpisodeNameSrc = new QLabel(gridLayoutWidget);
+
+        verticalLayout->addLayout(horizontalLayout_4);
+
+        horizontalLayout_6 = new QHBoxLayout();
+        horizontalLayout_6->setSpacing(6);
+        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+        labelName = new QLabel(verticalLayoutWidget);
+        labelName->setObjectName(QString::fromUtf8("labelName"));
+        labelName->setMinimumSize(QSize(150, 0));
+        labelName->setMaximumSize(QSize(150, 16777215));
+
+        horizontalLayout_6->addWidget(labelName);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
+        buttonLookup = new QPushButton(verticalLayoutWidget);
+        buttonLookup->setObjectName(QString::fromUtf8("buttonLookup"));
+        sizePolicy.setHeightForWidth(buttonLookup->sizePolicy().hasHeightForWidth());
+        buttonLookup->setSizePolicy(sizePolicy);
+        buttonLookup->setMinimumSize(QSize(24, 24));
+        buttonLookup->setMaximumSize(QSize(24, 24));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/ShikiRename/shell32icons/22.png"), QSize(), QIcon::Normal, QIcon::Off);
+        buttonLookup->setIcon(icon2);
+
+        horizontalLayout_2->addWidget(buttonLookup);
+
+        editName = new QLineEdit(verticalLayoutWidget);
+        editName->setObjectName(QString::fromUtf8("editName"));
+        editName->setMinimumSize(QSize(281, 0));
+
+        horizontalLayout_2->addWidget(editName);
+
+
+        horizontalLayout_6->addLayout(horizontalLayout_2);
+
+
+        verticalLayout->addLayout(horizontalLayout_6);
+
+        horizontalLayout_7 = new QHBoxLayout();
+        horizontalLayout_7->setSpacing(6);
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        labelSeasonNrPrefix = new QLabel(verticalLayoutWidget);
+        labelSeasonNrPrefix->setObjectName(QString::fromUtf8("labelSeasonNrPrefix"));
+        labelSeasonNrPrefix->setMinimumSize(QSize(150, 0));
+        labelSeasonNrPrefix->setMaximumSize(QSize(150, 16777215));
+
+        horizontalLayout_7->addWidget(labelSeasonNrPrefix);
+
+        horizontalLayout_5 = new QHBoxLayout();
+        horizontalLayout_5->setSpacing(6);
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
+        editSeasonNrPrefix = new QLineEdit(verticalLayoutWidget);
+        editSeasonNrPrefix->setObjectName(QString::fromUtf8("editSeasonNrPrefix"));
+        editSeasonNrPrefix->setMinimumSize(QSize(200, 0));
+        editSeasonNrPrefix->setMaximumSize(QSize(200, 16777215));
+
+        horizontalLayout_5->addWidget(editSeasonNrPrefix);
+
+        labelSeasonNrDigits = new QLabel(verticalLayoutWidget);
+        labelSeasonNrDigits->setObjectName(QString::fromUtf8("labelSeasonNrDigits"));
+        labelSeasonNrDigits->setMinimumSize(QSize(50, 0));
+        labelSeasonNrDigits->setMaximumSize(QSize(50, 16777215));
+
+        horizontalLayout_5->addWidget(labelSeasonNrDigits);
+
+        editSeasonNrDigits = new QLineEdit(verticalLayoutWidget);
+        editSeasonNrDigits->setObjectName(QString::fromUtf8("editSeasonNrDigits"));
+        editSeasonNrDigits->setMinimumSize(QSize(50, 0));
+        editSeasonNrDigits->setMaximumSize(QSize(50, 16777215));
+
+        horizontalLayout_5->addWidget(editSeasonNrDigits);
+
+
+        horizontalLayout_7->addLayout(horizontalLayout_5);
+
+
+        verticalLayout->addLayout(horizontalLayout_7);
+
+        horizontalLayout_11 = new QHBoxLayout();
+        horizontalLayout_11->setSpacing(6);
+        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
+        labelDUMMY = new QLabel(verticalLayoutWidget);
+        labelDUMMY->setObjectName(QString::fromUtf8("labelDUMMY"));
+        labelDUMMY->setMinimumSize(QSize(150, 0));
+        labelDUMMY->setMaximumSize(QSize(150, 16777215));
+
+        horizontalLayout_11->addWidget(labelDUMMY);
+
+        checkboxNoSeason = new QCheckBox(verticalLayoutWidget);
+        checkboxNoSeason->setObjectName(QString::fromUtf8("checkboxNoSeason"));
+        QSizePolicy sizePolicy3(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy3.setHorizontalStretch(0);
+        sizePolicy3.setVerticalStretch(0);
+        sizePolicy3.setHeightForWidth(checkboxNoSeason->sizePolicy().hasHeightForWidth());
+        checkboxNoSeason->setSizePolicy(sizePolicy3);
+        checkboxNoSeason->setMinimumSize(QSize(312, 22));
+        checkboxNoSeason->setMaximumSize(QSize(16777215, 16777215));
+        checkboxNoSeason->setLayoutDirection(Qt::LeftToRight);
+
+        horizontalLayout_11->addWidget(checkboxNoSeason);
+
+
+        verticalLayout->addLayout(horizontalLayout_11);
+
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setSpacing(6);
+        horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
+        labelEpisodeNrPrefix = new QLabel(verticalLayoutWidget);
+        labelEpisodeNrPrefix->setObjectName(QString::fromUtf8("labelEpisodeNrPrefix"));
+        labelEpisodeNrPrefix->setMinimumSize(QSize(150, 0));
+        labelEpisodeNrPrefix->setMaximumSize(QSize(150, 16777215));
+
+        horizontalLayout_8->addWidget(labelEpisodeNrPrefix);
+
+        horizontalLayout_3 = new QHBoxLayout();
+        horizontalLayout_3->setSpacing(6);
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        editEpisodeNrPrefix = new QLineEdit(verticalLayoutWidget);
+        editEpisodeNrPrefix->setObjectName(QString::fromUtf8("editEpisodeNrPrefix"));
+        sizePolicy2.setHeightForWidth(editEpisodeNrPrefix->sizePolicy().hasHeightForWidth());
+        editEpisodeNrPrefix->setSizePolicy(sizePolicy2);
+        editEpisodeNrPrefix->setMinimumSize(QSize(200, 0));
+        editEpisodeNrPrefix->setMaximumSize(QSize(200, 16777215));
+
+        horizontalLayout_3->addWidget(editEpisodeNrPrefix);
+
+        labelEpisodeNrDigits = new QLabel(verticalLayoutWidget);
+        labelEpisodeNrDigits->setObjectName(QString::fromUtf8("labelEpisodeNrDigits"));
+        labelEpisodeNrDigits->setMinimumSize(QSize(50, 0));
+        labelEpisodeNrDigits->setMaximumSize(QSize(50, 16777215));
+
+        horizontalLayout_3->addWidget(labelEpisodeNrDigits);
+
+        editEpisodeNrDigits = new QLineEdit(verticalLayoutWidget);
+        editEpisodeNrDigits->setObjectName(QString::fromUtf8("editEpisodeNrDigits"));
+        editEpisodeNrDigits->setMinimumSize(QSize(50, 0));
+        editEpisodeNrDigits->setMaximumSize(QSize(50, 16777215));
+
+        horizontalLayout_3->addWidget(editEpisodeNrDigits);
+
+
+        horizontalLayout_8->addLayout(horizontalLayout_3);
+
+
+        verticalLayout->addLayout(horizontalLayout_8);
+
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setSpacing(6);
+        horizontalLayout_9->setObjectName(QString::fromUtf8("horizontalLayout_9"));
+        labelEpisodeNameSrc = new QLabel(verticalLayoutWidget);
         labelEpisodeNameSrc->setObjectName(QString::fromUtf8("labelEpisodeNameSrc"));
+        labelEpisodeNameSrc->setMinimumSize(QSize(150, 0));
+        labelEpisodeNameSrc->setMaximumSize(QSize(150, 16777215));
 
-        tab_2_gridLayout->addWidget(labelEpisodeNameSrc, 4, 0, 1, 1);
+        horizontalLayout_9->addWidget(labelEpisodeNameSrc);
 
-        comboEpisodeNameSrc = new QComboBox(gridLayoutWidget);
+        comboEpisodeNameSrc = new QComboBox(verticalLayoutWidget);
         comboEpisodeNameSrc->addItem(QString());
         comboEpisodeNameSrc->addItem(QString());
         comboEpisodeNameSrc->setObjectName(QString::fromUtf8("comboEpisodeNameSrc"));
+        comboEpisodeNameSrc->setMinimumSize(QSize(312, 0));
+        comboEpisodeNameSrc->setMaximumSize(QSize(312, 16777215));
 
-        tab_2_gridLayout->addWidget(comboEpisodeNameSrc, 4, 1, 1, 1);
+        horizontalLayout_9->addWidget(comboEpisodeNameSrc);
 
-        labelEpisodeNrPrefix = new QLabel(gridLayoutWidget);
-        labelEpisodeNrPrefix->setObjectName(QString::fromUtf8("labelEpisodeNrPrefix"));
 
-        tab_2_gridLayout->addWidget(labelEpisodeNrPrefix, 3, 0, 1, 1);
+        verticalLayout->addLayout(horizontalLayout_9);
 
-        labelEpisodeNameLang = new QLabel(gridLayoutWidget);
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setSpacing(6);
+        horizontalLayout_10->setObjectName(QString::fromUtf8("horizontalLayout_10"));
+        labelEpisodeNameLang = new QLabel(verticalLayoutWidget);
         labelEpisodeNameLang->setObjectName(QString::fromUtf8("labelEpisodeNameLang"));
+        labelEpisodeNameLang->setMinimumSize(QSize(150, 0));
+        labelEpisodeNameLang->setMaximumSize(QSize(150, 16777215));
 
-        tab_2_gridLayout->addWidget(labelEpisodeNameLang, 4, 2, 1, 1);
+        horizontalLayout_10->addWidget(labelEpisodeNameLang);
 
-        checkboxNoSeason = new QCheckBox(gridLayoutWidget);
-        checkboxNoSeason->setObjectName(QString::fromUtf8("checkboxNoSeason"));
+        comboEpisodeNameLang = new QComboBox(verticalLayoutWidget);
+        comboEpisodeNameLang->setObjectName(QString::fromUtf8("comboEpisodeNameLang"));
+        comboEpisodeNameLang->setMinimumSize(QSize(312, 0));
+        comboEpisodeNameLang->setMaximumSize(QSize(312, 16777215));
 
-        tab_2_gridLayout->addWidget(checkboxNoSeason, 2, 4, 2, 1);
+        horizontalLayout_10->addWidget(comboEpisodeNameLang);
 
-        labelSeasonNrPrefix = new QLabel(gridLayoutWidget);
-        labelSeasonNrPrefix->setObjectName(QString::fromUtf8("labelSeasonNrPrefix"));
 
-        tab_2_gridLayout->addWidget(labelSeasonNrPrefix, 2, 0, 1, 1);
-
-        buttonCustomFileNameReset = new QPushButton(gridLayoutWidget);
-        buttonCustomFileNameReset->setObjectName(QString::fromUtf8("buttonCustomFileNameReset"));
-
-        tab_2_gridLayout->addWidget(buttonCustomFileNameReset, 0, 4, 1, 1);
-
-        editName = new QLineEdit(gridLayoutWidget);
-        editName->setObjectName(QString::fromUtf8("editName"));
-
-        tab_2_gridLayout->addWidget(editName, 1, 1, 1, 4);
-
-        labelSeasonNrDigits = new QLabel(gridLayoutWidget);
-        labelSeasonNrDigits->setObjectName(QString::fromUtf8("labelSeasonNrDigits"));
-
-        tab_2_gridLayout->addWidget(labelSeasonNrDigits, 2, 2, 1, 1);
-
-        labelEpisodeNrDigits = new QLabel(gridLayoutWidget);
-        labelEpisodeNrDigits->setObjectName(QString::fromUtf8("labelEpisodeNrDigits"));
-
-        tab_2_gridLayout->addWidget(labelEpisodeNrDigits, 3, 2, 1, 1);
-
-        labelName = new QLabel(gridLayoutWidget);
-        labelName->setObjectName(QString::fromUtf8("labelName"));
-
-        tab_2_gridLayout->addWidget(labelName, 1, 0, 1, 1);
-
-        editSeasonNrDigits = new QLineEdit(gridLayoutWidget);
-        editSeasonNrDigits->setObjectName(QString::fromUtf8("editSeasonNrDigits"));
-
-        tab_2_gridLayout->addWidget(editSeasonNrDigits, 2, 3, 1, 1);
-
-        checkboxCustomFileName = new QCheckBox(gridLayoutWidget);
-        checkboxCustomFileName->setObjectName(QString::fromUtf8("checkboxCustomFileName"));
-
-        tab_2_gridLayout->addWidget(checkboxCustomFileName, 0, 0, 1, 1);
+        verticalLayout->addLayout(horizontalLayout_10);
 
         tabWidget->addTab(tab_2, QString());
 
         vLayout_Main->addWidget(tabWidget);
 
-        vLayout_Main->setStretch(1, 100);
-        vLayout_Main->setStretch(3, 70);
 
         gLayout_centralWidget->addLayout(vLayout_Main, 1, 2, 1, 2);
 
         ShikiRenameClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(ShikiRenameClass);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 1387, 21));
+        menuBar->setGeometry(QRect(0, 0, 1202, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         menuEdit = new QMenu(menuBar);
@@ -513,14 +665,7 @@ public:
         QWidget::setTabOrder(editNumIdx, editNumInitV);
         QWidget::setTabOrder(editNumInitV, editNumInc);
         QWidget::setTabOrder(editNumInc, editNumDigits);
-        QWidget::setTabOrder(editNumDigits, editName);
-        QWidget::setTabOrder(editName, editSeasonNrPrefix);
-        QWidget::setTabOrder(editSeasonNrPrefix, editSeasonNrDigits);
-        QWidget::setTabOrder(editSeasonNrDigits, editEpisodeNrPrefix);
-        QWidget::setTabOrder(editEpisodeNrPrefix, editEpisodeNrDigits);
-        QWidget::setTabOrder(editEpisodeNrDigits, comboEpisodeNameSrc);
-        QWidget::setTabOrder(comboEpisodeNameSrc, comboEpisodeNameLang);
-        QWidget::setTabOrder(comboEpisodeNameLang, buttonRename);
+        QWidget::setTabOrder(editNumDigits, buttonRename);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuEdit->menuAction());
@@ -548,6 +693,7 @@ public:
         actionRefresh->setText(QApplication::translate("ShikiRenameClass", "Refresh", nullptr));
         buttonRename->setText(QApplication::translate("ShikiRenameClass", "Rename", nullptr));
         buttonOpen->setText(QString());
+        editDirectory->setPlaceholderText(QApplication::translate("ShikiRenameClass", "<directory>", nullptr));
         checkboxOnlySelected->setText(QApplication::translate("ShikiRenameClass", "Rename only selected entries", nullptr));
         labelRemoveLeft2->setText(QApplication::translate("ShikiRenameClass", "characters", nullptr));
         labelRemoveRight2->setText(QApplication::translate("ShikiRenameClass", "characters", nullptr));
@@ -577,27 +723,35 @@ public:
         editNumDigits->setText(QString());
         editNumDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "1", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_1), QApplication::translate("ShikiRenameClass", "Edit", nullptr));
-        editEpisodeNrDigits->setText(QString());
-        editEpisodeNrDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "2", nullptr));
+        checkboxCustomFileName->setText(QApplication::translate("ShikiRenameClass", "Customize File Name", nullptr));
+#ifndef QT_NO_TOOLTIP
+        buttonCustomFileNameReset->setToolTip(QApplication::translate("ShikiRenameClass", "Reset", nullptr));
+#endif // QT_NO_TOOLTIP
+        buttonCustomFileNameReset->setText(QString());
+        labelName->setText(QApplication::translate("ShikiRenameClass", "Name", nullptr));
+#ifndef QT_NO_TOOLTIP
+        buttonLookup->setToolTip(QApplication::translate("ShikiRenameClass", "Lookup", nullptr));
+#endif // QT_NO_TOOLTIP
+        buttonLookup->setText(QString());
+        labelSeasonNrPrefix->setText(QApplication::translate("ShikiRenameClass", "Prefix Season Number", nullptr));
         editSeasonNrPrefix->setText(QString());
         editSeasonNrPrefix->setPlaceholderText(QApplication::translate("ShikiRenameClass", "s", nullptr));
+        labelSeasonNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
+        editSeasonNrDigits->setText(QString());
+        editSeasonNrDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "2", nullptr));
+        labelDUMMY->setText(QString());
+        checkboxNoSeason->setText(QApplication::translate("ShikiRenameClass", "No season numbers", nullptr));
+        labelEpisodeNrPrefix->setText(QApplication::translate("ShikiRenameClass", "Prefix Episode Number", nullptr));
         editEpisodeNrPrefix->setText(QString());
         editEpisodeNrPrefix->setPlaceholderText(QApplication::translate("ShikiRenameClass", "e", nullptr));
-        labelEpisodeNameSrc->setText(QApplication::translate("ShikiRenameClass", "Episode Name Source", nullptr));
+        labelEpisodeNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
+        editEpisodeNrDigits->setText(QString());
+        editEpisodeNrDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "2", nullptr));
+        labelEpisodeNameSrc->setText(QApplication::translate("ShikiRenameClass", "Online Source", nullptr));
         comboEpisodeNameSrc->setItemText(0, QString());
         comboEpisodeNameSrc->setItemText(1, QApplication::translate("ShikiRenameClass", "TheTVDB.com", nullptr));
 
-        labelEpisodeNrPrefix->setText(QApplication::translate("ShikiRenameClass", "Prefix Episode Number", nullptr));
         labelEpisodeNameLang->setText(QApplication::translate("ShikiRenameClass", "Language", nullptr));
-        checkboxNoSeason->setText(QApplication::translate("ShikiRenameClass", "No season numbers", nullptr));
-        labelSeasonNrPrefix->setText(QApplication::translate("ShikiRenameClass", "Prefix Season Number", nullptr));
-        buttonCustomFileNameReset->setText(QApplication::translate("ShikiRenameClass", "Reset", nullptr));
-        labelSeasonNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
-        labelEpisodeNrDigits->setText(QApplication::translate("ShikiRenameClass", "Digits", nullptr));
-        labelName->setText(QApplication::translate("ShikiRenameClass", "Name", nullptr));
-        editSeasonNrDigits->setText(QString());
-        editSeasonNrDigits->setPlaceholderText(QApplication::translate("ShikiRenameClass", "2", nullptr));
-        checkboxCustomFileName->setText(QApplication::translate("ShikiRenameClass", "Customize File Name", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("ShikiRenameClass", "Movies / Episodes", nullptr));
         menuFile->setTitle(QApplication::translate("ShikiRenameClass", "File", nullptr));
         menuEdit->setTitle(QApplication::translate("ShikiRenameClass", "Edit", nullptr));
