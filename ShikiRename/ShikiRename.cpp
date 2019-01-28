@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QWindowStateChangeEvent>
 #include <QtWin>
+#include <QScrollBar>
 
 ShikiRename::ShikiRename(QWidget *parent) :
 	QMainWindow(parent),
@@ -129,6 +130,9 @@ ShikiRename::ShikiRename(QWidget *parent) :
 
 	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
 	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
+
+	ui->renamePreview->setVerticalScrollBar(ui->currentList->verticalScrollBar());	//oddly moves currentList's scrollbar to renamePreview
+	ui->currentList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);	//no longer has a scrollbar, so this essentially just removes the scrollbar area
 	//tvdb communication
 	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(setData(QJsonArray)));
 	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(show()));
@@ -906,15 +910,11 @@ void ShikiRename::on_seriesSelectedDialog_closed(const int &id, const QString &n
 bool ShikiRename::onlineDbAvailable() {
 	if (input_vid_eNameSrc == MetaDB::TheTVDB && tvdb.isAvailable())
 		return true;
-
 	qDebug() << "Selected online meta database is not available.";
 	return false;
 }
 
 void ShikiRename::findSeries() {
-	if (!onlineDbAvailable())
-		return;
-
 	tvdb.requestsSeries(input_vid_name);
 }
 
@@ -937,7 +937,6 @@ QIcon ShikiRename::loadIcon(int id) {
 		qDebug() << "Extracting icon #" << i;
 	}
 	*/
-	//QPixmap icon = QtWin::fromHICON(ExtractIconA(GetModuleHandle(NULL), "shell32.dll", id));
 	QIcon icon = QIcon(":/ShikiRename/shell32icons/" + QString::number(id) + ".png");
 	return icon;
 }

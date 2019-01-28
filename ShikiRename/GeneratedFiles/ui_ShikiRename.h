@@ -187,7 +187,7 @@ public:
         vLayout_Main->addLayout(hLayout_Directory);
 
         hLayout_Lists = new QHBoxLayout();
-        hLayout_Lists->setSpacing(6);
+        hLayout_Lists->setSpacing(0);
         hLayout_Lists->setObjectName(QString::fromUtf8("hLayout_Lists"));
         currentList = new QListWidget(centralWidget);
         currentList->setObjectName(QString::fromUtf8("currentList"));
