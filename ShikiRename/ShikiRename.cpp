@@ -639,7 +639,7 @@ void ShikiRename::buildPreview() {
 						QJsonObject jo = item.toObject();
 						if (jo.value("airedSeason").toInt() == season && jo.value("airedEpisodeNumber").toInt() == ep) {
 							episodeName = jo.value("episodeName").toString();
-							episodeName.remove(rgx_invalidFnCharset_win);	//probably redundant because we're tidying it up again at the end anyway
+							//episodeName.remove(rgx_invalidFnCharset_win);	//redundant because we're tidying it up again at the end anyway
 							episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
 							episodeYear = jo.value("firstAired").toString().left(4);
 							break;
