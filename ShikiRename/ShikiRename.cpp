@@ -933,12 +933,12 @@ void ShikiRename::on_tvdb_loggedIn() {
 	}
 }
 
+/*
 QIcon loadIcon(int id) {
-	/*
-	for (int i = 0; QtWin::fromHICON(ExtractIconA(GetModuleHandle(NULL), "shell32.dll", i)).save(QDir::currentPath() + "/shell32 icons/" + QString::number(i) + ".png", "png", 100); i++) {
-		qDebug() << "Extracting icon #" << i;
-	}
-	*/
+	//for (int i = 0; QtWin::fromHICON(ExtractIconA(GetModuleHandle(NULL), "shell32.dll", i)).save(QDir::currentPath() + "/shell32 icons/" + QString::number(i) + ".png", "png", 100); i++) {
+	//	qDebug() << "Extracting icon #" << i;
+	//}
 	QIcon icon = QIcon(":/ShikiRename/shell32icons/" + QString::number(id) + ".png");
 	return icon;
 }
+*/
