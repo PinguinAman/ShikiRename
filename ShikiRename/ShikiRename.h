@@ -27,11 +27,44 @@ class ShikiRename : public QMainWindow
 {
 	Q_OBJECT
 
+		enum FileInfoItemRole {
+		AbsolutePath = Qt::UserRole
+	};
+
 public:
-	const enum MetaDB { None = 0, TheTVDB = 1 };
-	const int MAX_INT = (std::numeric_limits<int>::max)();
 	explicit ShikiRename(QWidget *parent = 0);
 	~ShikiRename();
+	const enum MetaDB { None = 0, TheTVDB = 1 };
+	const int MAX_INT = (std::numeric_limits<int>::max)();
+
+	struct input_values {
+		//tab 1
+		int remLeft = 0;
+		int remRight = 0;
+		QString replace1;
+		QString replace2;
+		int insert_idx = -1;
+		QString insert_string;
+		int removeAt_amount = 0;
+		int removeAt_idx = -1;
+		bool onlySelected = false;
+		QString prefix;
+		QString suffix;
+		int num_idx = -1;
+		int num_init = 1;
+		int num_inc = 1;
+		int num_digits = 1;
+		//tab 2
+		QString vid_customFileNameRaw;
+		QString vid_name;
+		QString vid_sPrefix = "s";
+		int vid_sDigits = 2;
+		QString vid_ePrefix = "e";
+		int vid_eDigits = 2;
+		bool vid_noSeason = false;
+		MetaDB vid_eNameSrc;
+		QString vid_eNameLang = "en";
+	};
 
 signals:
 	void workingStarts();
@@ -139,40 +172,10 @@ private:
 	std::vector<std::tuple<int, QString, QString>> hist_undo; //id, old, new
 	std::vector<std::tuple<int, QString, QString>> hist_redo; //id, new, old
 
-	//tab 1
-	int input_remLeft = 0;
-	int input_remRight = 0;
-	QString input_replace1;
-	QString input_replace2;
-	int input_insert_idx = -1;
-	QString input_insert_string;
-	int input_removeAt_amount = 0;
-	int input_removeAt_idx = -1;
-	bool input_onlySelected = false;
-	QString input_prefix;
-	QString input_suffix;
-	int input_num_idx = -1;
-	int input_num_init = 1;
-	int input_num_inc = 1;
-	int input_num_digits = 1;
-	//tab 2
-	QString input_vid_customFileNameRaw;
-	QString input_vid_name;
-	QString input_vid_sPrefix = "s";
-	int input_vid_sDigits = 2;
-	QString input_vid_ePrefix = "e";
-	int input_vid_eDigits = 2;
-	bool input_vid_noSeason = false;
-	MetaDB input_vid_eNameSrc;
-	QString input_vid_eNameLang = "en";
-	QString releaseDataSuffix;
-	bool input_epDetection = false;
-	bool ongoingSeriesSelection = false;
+	input_values input;
+
 	QFutureWatcher<void> previewFW;
 	QFutureWatcher<int> dirWatcherFW;
-	//QTimer *tvdbSearchDelayTimer;
-
-	QIcon loadIcon(int id);
 };
 
 #endif // SHIKIRENAME_H

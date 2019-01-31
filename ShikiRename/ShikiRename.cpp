@@ -120,10 +120,12 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->editEpisodeNrDigits->setToolTip(tt_ENUMB);
 	ui->checkboxNoSeason->setToolTip(tt_GEPNR);
 
+	/*Removed feature, code kept for quick reference
 	//Don't search for every character input, but wait till the user stops typing.
-	/*tvdbSearchDelayTimer = new QTimer(this);
+	tvdbSearchDelayTimer = new QTimer(this);
 	tvdbSearchDelayTimer->setSingleShot(true);
-	connect(tvdbSearchDelayTimer, &QTimer::timeout, this, [this] { findSeries(); });	//https://stackoverflow.com/a/22411267*/
+	connect(tvdbSearchDelayTimer, &QTimer::timeout, this, [this] { findSeries(); });	//https://stackoverflow.com/a/22411267
+	*/
 
 	seriesSelectionDialog = new SeriesSelectionDialog(this);
 	renameConfirmationDialog = new RenameConfirmationDialog(this);
@@ -183,107 +185,107 @@ void ShikiRename::on_editDirectory_returnPressed()
 void ShikiRename::on_editRemoveLeft_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_remLeft = ui->editRemoveLeft->placeholderText().toInt();
+		input.remLeft = ui->editRemoveLeft->placeholderText().toInt();
 	else
-		input_remLeft = arg1.toInt();
+		input.remLeft = arg1.toInt();
 	this->previewRename();
 }
 void ShikiRename::on_editRemoveRight_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_remRight = ui->editRemoveRight->placeholderText().toInt();
+		input.remRight = ui->editRemoveRight->placeholderText().toInt();
 	else
-		input_remRight = arg1.toInt();
+		input.remRight = arg1.toInt();
 	this->previewRename();
 }
 void ShikiRename::on_editReplace1_textChanged(const QString &arg1)
 {
-	input_replace1 = arg1;
+	input.replace1 = arg1;
 	this->previewRename();
 }
 void ShikiRename::on_editReplace2_textChanged(const QString &arg1)
 {
-	input_replace2 = arg1;
-	if (!input_replace1.isEmpty() && !input_replace1.isNull())
+	input.replace2 = arg1;
+	if (!input.replace1.isEmpty() && !input.replace1.isNull())
 		this->previewRename();
 }
 void ShikiRename::on_editInsert1_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_insert_idx = -1;
+		input.insert_idx = -1;
 	else
-		input_insert_idx = arg1.toInt();
-	if (!input_insert_string.isEmpty() && !input_insert_string.isNull())
+		input.insert_idx = arg1.toInt();
+	if (!input.insert_string.isEmpty() && !input.insert_string.isNull())
 		this->previewRename();
 }
 void ShikiRename::on_editInsert2_textChanged(const QString &arg1)
 {
-	input_insert_string = arg1;
-	if (input_insert_idx >= 0)
+	input.insert_string = arg1;
+	if (input.insert_idx >= 0)
 		this->previewRename();
 }
 void ShikiRename::on_editRemoveAt1_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_removeAt_amount = ui->editRemoveAt1->placeholderText().toInt();
+		input.removeAt_amount = ui->editRemoveAt1->placeholderText().toInt();
 	else
-		input_removeAt_amount = arg1.toInt();
-	if (input_removeAt_idx >= 0)
+		input.removeAt_amount = arg1.toInt();
+	if (input.removeAt_idx >= 0)
 		this->previewRename();
 }
 void ShikiRename::on_editRemoveAt2_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_removeAt_idx = -1;
+		input.removeAt_idx = -1;
 	else
-		input_removeAt_idx = arg1.toInt();
-	if (input_removeAt_amount > 0)
+		input.removeAt_idx = arg1.toInt();
+	if (input.removeAt_amount > 0)
 		this->previewRename();
 }
 void ShikiRename::on_editPrefix_textChanged(const QString &arg1)
 {
-	input_prefix = arg1;
+	input.prefix = arg1;
 	this->previewRename();
 }
 void ShikiRename::on_editSuffix_textChanged(const QString &arg1)
 {
-	input_suffix = arg1;
+	input.suffix = arg1;
 	this->previewRename();
 }
 void ShikiRename::on_editNumIdx_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_num_idx = -1;
+		input.num_idx = -1;
 	else
-		input_num_idx = arg1.toInt();
-	if (input_num_init >= 0 && input_num_digits > 0 && input_num_inc >= 0)
+		input.num_idx = arg1.toInt();
+	if (input.num_init >= 0 && input.num_digits > 0 && input.num_inc >= 0)
 		this->previewRename();
 }
 void ShikiRename::on_editNumInc_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_num_inc = ui->editNumInc->placeholderText().toInt();
+		input.num_inc = ui->editNumInc->placeholderText().toInt();
 	else
-		input_num_inc = arg1.toInt();
-	if (input_num_idx >= 0 && input_num_digits > 0 && input_num_init >= 0)
+		input.num_inc = arg1.toInt();
+	if (input.num_idx >= 0 && input.num_digits > 0 && input.num_init >= 0)
 		this->previewRename();
 }
 void ShikiRename::on_editNumInitV_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_num_init = ui->editNumInitV->placeholderText().toInt();
+		input.num_init = ui->editNumInitV->placeholderText().toInt();
 	else
-		input_num_init = arg1.toInt();
-	if (input_num_idx >= 0 && input_num_inc >= 0 && input_num_digits > 0)
+		input.num_init = arg1.toInt();
+	if (input.num_idx >= 0 && input.num_inc >= 0 && input.num_digits > 0)
 		this->previewRename();
 }
 void ShikiRename::on_editNumDigits_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_num_digits = ui->editNumDigits->placeholderText().toInt();
+		input.num_digits = ui->editNumDigits->placeholderText().toInt();
 	else
-		input_num_digits = arg1.toInt();
-	if (input_num_idx >= 0 && input_num_init >= 0 && input_num_inc >= 0)
+		input.num_digits = arg1.toInt();
+	if (input.num_idx >= 0 && input.num_init >= 0 && input.num_inc >= 0)
 		this->previewRename();
 }
 
@@ -300,14 +302,14 @@ void ShikiRename::on_checkboxCustomFileName_toggled(const bool &checked)
 }
 void ShikiRename::on_editCustomFileName_textChanged(const QString &arg1)
 {
-	input_vid_customFileNameRaw = arg1;
+	input.vid_customFileNameRaw = arg1;
 
 	this->previewRename();
 }
 void ShikiRename::on_editName_textEdited(const QString &arg1)
 {
-	input_vid_name = arg1;
-	if (!input_vid_name.isEmpty()) {
+	input.vid_name = arg1;
+	if (!input.vid_name.isEmpty()) {
 		ui->buttonLookup->setDisabled(false);
 	}
 	this->previewRename();
@@ -315,47 +317,47 @@ void ShikiRename::on_editName_textEdited(const QString &arg1)
 void ShikiRename::on_editSeasonNrPrefix_textChanged(const QString &arg1)
 {
 	if (!arg1.isEmpty()) {
-		input_vid_sPrefix = arg1;
+		input.vid_sPrefix = arg1;
 	}
 	else {
-		input_vid_sPrefix = ui->editSeasonNrPrefix->placeholderText();
+		input.vid_sPrefix = ui->editSeasonNrPrefix->placeholderText();
 	}
 	this->previewRename();
 }
 void ShikiRename::on_editSeasonNrDigits_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_vid_sDigits = ui->editSeasonNrDigits->placeholderText().toInt();
+		input.vid_sDigits = ui->editSeasonNrDigits->placeholderText().toInt();
 	else
-		input_vid_sDigits = arg1.toInt();
+		input.vid_sDigits = arg1.toInt();
 	this->previewRename();
 }
 void ShikiRename::on_editEpisodeNrPrefix_textChanged(const QString &arg1)
 {
 	if (!arg1.isEmpty()) {
-		input_vid_ePrefix = arg1;
+		input.vid_ePrefix = arg1;
 	}
 	else {
-		input_vid_ePrefix = ui->editEpisodeNrPrefix->placeholderText();
+		input.vid_ePrefix = ui->editEpisodeNrPrefix->placeholderText();
 	}
 	this->previewRename();
 }
 void ShikiRename::on_editEpisodeNrDigits_textChanged(const QString &arg1)
 {
 	if (arg1.isEmpty())
-		input_vid_eDigits = ui->editEpisodeNrDigits->placeholderText().toInt();
+		input.vid_eDigits = ui->editEpisodeNrDigits->placeholderText().toInt();
 	else
-		input_vid_eDigits = arg1.toInt();
+		input.vid_eDigits = arg1.toInt();
 	this->previewRename();
 }
 void ShikiRename::on_checkboxNoSeason_toggled(const bool &checked) {
-	input_vid_noSeason = checked;
+	input.vid_noSeason = checked;
 	this->previewRename();
 }
 void ShikiRename::on_comboEpisodeNameSrc_currentIndexChanged(const int &index)
 {
-	input_vid_eNameSrc = MetaDB(index);
-	if (!input_vid_name.isEmpty()) {
+	input.vid_eNameSrc = MetaDB(index);
+	if (!input.vid_name.isEmpty()) {
 		ui->buttonLookup->setDisabled(false);
 	}
 }
@@ -365,10 +367,10 @@ void ShikiRename::on_comboEpisodeNameLang_currentIndexChanged(const int &index)
 	QString selectedLang = ui->comboEpisodeNameLang->itemText(index);
 	tvdb.setRequestLanguage(selectedLang);
 	for (auto item : tvdb.getLanguages()) {
-		if (item.first == selectedLang && input_vid_eNameLang != item.second) {	//long name equals selected long name & short name is not already selected
-			input_vid_eNameLang = item.second;
-			tvdb.setRequestLanguage(input_vid_eNameLang);
-			if (!input_vid_name.isEmpty()) {
+		if (item.first == selectedLang && input.vid_eNameLang != item.second) {	//long name equals selected long name & short name is not already selected
+			input.vid_eNameLang = item.second;
+			tvdb.setRequestLanguage(input.vid_eNameLang);
+			if (!input.vid_name.isEmpty()) {
 				ui->buttonLookup->setDisabled(false);
 			}
 			break;
@@ -385,7 +387,7 @@ void ShikiRename::comboEpisodeNameLang_addItems(QStringList items) {
 }
 void ShikiRename::on_checkboxOnlySelected_toggled(const bool &checked)
 {
-	input_onlySelected = checked;
+	input.onlySelected = checked;
 	this->previewRename();
 }
 void ShikiRename::on_currentList_itemSelectionChanged()
@@ -395,13 +397,13 @@ void ShikiRename::on_currentList_itemSelectionChanged()
 	for (auto item : selectedItems) {
 		selectedFilenames.append(item->text());
 	}
-	if (input_onlySelected) {
+	if (input.onlySelected) {
 		searchEpisode_startIdx = -1;
 		this->previewRename();
 	}
 }
 bool ShikiRename::isSelectedInList(QString filename) {
-	return (!input_onlySelected || input_onlySelected && selectedFilenames.contains(filename));
+	return (!input.onlySelected || input.onlySelected && selectedFilenames.contains(filename));
 }
 
 void ShikiRename::open(QDir dir) {
@@ -419,9 +421,10 @@ void ShikiRename::open(QDir dir) {
 	searchEpisode_startIdx = -1;
 
 	for (int i = 0; i < infoList.count(); i++) {
-		QString fn = infoList.at(i).fileName();
-		ui->renamePreview->addItem(fn);
-		ui->currentList->addItem(fn);
+		QFileInfo fi = infoList.at(i);
+		QListWidgetItem* item = new QListWidgetItem(fi.fileName(), ui->currentList);
+		//item->setData(FileInfoItemRole::AbsolutePath, fi.absoluteFilePath());
+		addToPreview(item);
 	}
 
 	watchFileChanges();
@@ -562,7 +565,7 @@ void ShikiRename::buildPreview() {
 	emit workingStarts();
 	QMutableListIterator<QFileInfo> it(infoList);
 	QJsonArray episodeData = tvdb.getEpisodeData();
-	int cur_num = input_num_init;							//keeps track of our current number for the consecutive numeration operation
+	int cur_num = input.num_init;							//keeps track of our current number for the consecutive numeration operation
 
 	while (it.hasNext())									//iterates through every file
 	{
@@ -574,46 +577,46 @@ void ShikiRename::buildPreview() {
 			selected = true;
 			if (ui->tabWidget->currentIndex() == 0) {
 				//Remove left
-				if (input_remLeft > 0)
-					v = v.remove(0, input_remLeft);
+				if (input.remLeft > 0)
+					v = v.remove(0, input.remLeft);
 
 				//Remove right
-				if (input_remRight > 0)
-					v = v.remove(v.length() - input_remRight, input_remRight);
+				if (input.remRight > 0)
+					v = v.remove(v.length() - input.remRight, input.remRight);
 
 				//Replace x with y
-				if (!input_replace1.isNull() && !input_replace1.isEmpty()) {
-					if (input_replace2.isNull())
-						input_replace2 = "";
+				if (!input.replace1.isNull() && !input.replace1.isEmpty()) {
+					if (input.replace2.isNull())
+						input.replace2 = "";
 
-					for (int idx = v.length(); (idx = v.lastIndexOf(input_replace1, idx - 1)) != -1;)
+					for (int idx = v.length(); (idx = v.lastIndexOf(input.replace1, idx - 1)) != -1;)
 					{
-						v = v.replace(idx, input_replace1.length(), input_replace2);
+						v = v.replace(idx, input.replace1.length(), input.replace2);
 						if (idx == 0) break;
 					}
 				}
 
 				//Insert at idx a string
-				if (input_insert_idx >= 0 && !input_insert_string.isEmpty() && !input_insert_string.isNull() && input_insert_idx <= v.length())
-					v.insert(input_insert_idx, input_insert_string);
+				if (input.insert_idx >= 0 && !input.insert_string.isEmpty() && !input.insert_string.isNull() && input.insert_idx <= v.length())
+					v.insert(input.insert_idx, input.insert_string);
 
 				//Remove x characters after index y
-				if (input_removeAt_amount > 0 && input_removeAt_idx >= 0 && input_removeAt_idx <= v.length())
-					v = v.left(input_removeAt_idx) + v.right(v.length() - input_removeAt_idx - input_removeAt_amount);
+				if (input.removeAt_amount > 0 && input.removeAt_idx >= 0 && input.removeAt_idx <= v.length())
+					v = v.left(input.removeAt_idx) + v.right(v.length() - input.removeAt_idx - input.removeAt_amount);
 
 				//Prefix
-				if (!input_prefix.isNull())
-					v = v.prepend(input_prefix);
+				if (!input.prefix.isNull())
+					v = v.prepend(input.prefix);
 
 				//Suffix
-				if (!input_suffix.isNull())
-					v = v.append(input_suffix);
+				if (!input.suffix.isNull())
+					v = v.append(input.suffix);
 
 				//Consecutive numeration
-				if (input_num_idx >= 0 && input_num_init >= 0 && input_num_inc >= 0 && input_num_digits > 0) {
-					QString num_s = this->zerofy(QString::number(cur_num), input_num_digits);
-					v = v.insert(input_num_idx, num_s);
-					cur_num = cur_num + input_num_inc;
+				if (input.num_idx >= 0 && input.num_init >= 0 && input.num_inc >= 0 && input.num_digits > 0) {
+					QString num_s = this->zerofy(QString::number(cur_num), input.num_digits);
+					v = v.insert(input.num_idx, num_s);
+					cur_num = cur_num + input.num_inc;
 				}
 
 			}
@@ -623,7 +626,7 @@ void ShikiRename::buildPreview() {
 				std::pair<int, int> s_e = this->searchSeasonAndEpisode(v);
 				int season;
 				int ep;
-				if (!input_vid_noSeason) {
+				if (!input.vid_noSeason) {
 					season = s_e.first;
 					ep = s_e.second;
 				}
@@ -639,7 +642,6 @@ void ShikiRename::buildPreview() {
 						QJsonObject jo = item.toObject();
 						if (jo.value("airedSeason").toInt() == season && jo.value("airedEpisodeNumber").toInt() == ep) {
 							episodeName = jo.value("episodeName").toString();
-							//episodeName.remove(rgx_invalidFnCharset_win);	//redundant because we're tidying it up again at the end anyway
 							episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
 							episodeYear = jo.value("firstAired").toString().left(4);
 							break;
@@ -647,13 +649,13 @@ void ShikiRename::buildPreview() {
 					}
 				}
 
-				v = input_vid_customFileNameRaw;
-				v.replace(QString("<NAME>"), input_vid_name)
-					.replace(QString("<SEASON PREFIX>"), input_vid_sPrefix)
-					.replace(QString("<SEASON>"), this->zerofy(QString::number(season), input_vid_sDigits))
-					.replace(QString("<EPISODE PREFIX>"), input_vid_ePrefix)
-					.replace(QString("<EPISODE>"), this->zerofy(QString::number(ep), input_vid_eDigits))
-					.replace(QString("<EPISODE ABSOLUTE>"), this->zerofy(episodeAbsolute, input_vid_eDigits))
+				v = input.vid_customFileNameRaw;
+				v.replace(QString("<NAME>"), input.vid_name)
+					.replace(QString("<SEASON PREFIX>"), input.vid_sPrefix)
+					.replace(QString("<SEASON>"), this->zerofy(QString::number(season), input.vid_sDigits))
+					.replace(QString("<EPISODE PREFIX>"), input.vid_ePrefix)
+					.replace(QString("<EPISODE>"), this->zerofy(QString::number(ep), input.vid_eDigits))
+					.replace(QString("<EPISODE ABSOLUTE>"), this->zerofy(episodeAbsolute, input.vid_eDigits))
 					.replace(QString("<EPISODE NAME>"), episodeName)
 					.replace(QString("<YEAR>"), episodeYear)
 					.replace(QString("<LANGUAGE>"), mediaInfoCache[filePath]["language"])
@@ -780,11 +782,11 @@ void ShikiRename::on_buttonRename_clicked()
 	QList<QColor> appropiateTextColors = { Qt::red, Qt::blue, Qt::green, Qt::cyan, Qt::magenta, Qt::darkYellow };
 	int appropiateTextColorIterator = 0;
 	for (int i = 0; i < targetNames_sorted.count() - 1; i++) {
-		if (targetNames_sorted.at(i).compare(targetNames_sorted.at(i + 1), Qt::CaseInsensitive) == 0) {							//check if there are duplicate filenames
-			dupe_found = true;																							//there are dupes, so we won't rename
-			QList<QListWidgetItem *> li = ui->renamePreview->findItems(targetNames_sorted.at(i), Qt::MatchFixedString);			//get all dupe items in preview
+		if (targetNames_sorted.at(i).compare(targetNames_sorted.at(i + 1), Qt::CaseInsensitive) == 0) {	//check if there are duplicate filenames
+			dupe_found = true;																			//there are dupes, so we won't rename
+			QList<QListWidgetItem *> li = ui->renamePreview->findItems(targetNames_sorted.at(i), Qt::MatchFixedString);	//get all dupe items in preview
 			for (auto item : li)
-				item->setTextColor(appropiateTextColors.at(appropiateTextColorIterator%appropiateTextColors.length()));		//mark dupes in preview
+				item->setTextColor(appropiateTextColors.at(appropiateTextColorIterator%appropiateTextColors.length()));	//mark dupes in preview
 			appropiateTextColorIterator++;
 		}
 	}
@@ -902,20 +904,20 @@ void ShikiRename::on_seriesSelectedDialog_closed(const int &id, const QString &n
 	}
 	else {
 		ui->editName->setText(name);
-		input_vid_name = name;
+		input.vid_name = name;
 		tvdb.requestEpisodes(id, 1);
 	}
 }
 
 bool ShikiRename::onlineDbAvailable() {
-	if (input_vid_eNameSrc == MetaDB::TheTVDB && tvdb.isAvailable())
+	if (input.vid_eNameSrc == MetaDB::TheTVDB && tvdb.isAvailable())
 		return true;
 	qDebug() << "Selected online meta database is not available.";
 	return false;
 }
 
 void ShikiRename::findSeries() {
-	tvdb.requestsSeries(input_vid_name);
+	tvdb.requestsSeries(input.vid_name);
 }
 
 void ShikiRename::on_tvdb_authTimeout() {
@@ -931,7 +933,7 @@ void ShikiRename::on_tvdb_loggedIn() {
 	}
 }
 
-QIcon ShikiRename::loadIcon(int id) {
+QIcon loadIcon(int id) {
 	/*
 	for (int i = 0; QtWin::fromHICON(ExtractIconA(GetModuleHandle(NULL), "shell32.dll", i)).save(QDir::currentPath() + "/shell32 icons/" + QString::number(i) + ".png", "png", 100); i++) {
 		qDebug() << "Extracting icon #" << i;
