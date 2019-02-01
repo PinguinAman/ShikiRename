@@ -12,8 +12,9 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QFormLayout>
-#include <QtWidgets/QListWidget>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -23,7 +24,7 @@ class Ui_RenameConfirmationDialog
 {
 public:
     QVBoxLayout *verticalLayout;
-    QListWidget *targetFilenameEditor;
+    QTableWidget *targetFilenameEditor;
     QFormLayout *buttonLayout;
     QPushButton *buttonOK;
     QPushButton *buttonCancel;
@@ -40,13 +41,18 @@ public:
         RenameConfirmationDialog->setSizePolicy(sizePolicy);
         verticalLayout = new QVBoxLayout(RenameConfirmationDialog);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        targetFilenameEditor = new QListWidget(RenameConfirmationDialog);
+        targetFilenameEditor = new QTableWidget(RenameConfirmationDialog);
+        if (targetFilenameEditor->columnCount() < 1)
+            targetFilenameEditor->setColumnCount(1);
         targetFilenameEditor->setObjectName(QString::fromUtf8("targetFilenameEditor"));
         targetFilenameEditor->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
         targetFilenameEditor->setTabKeyNavigation(true);
         targetFilenameEditor->setProperty("showDropIndicator", QVariant(false));
         targetFilenameEditor->setSelectionMode(QAbstractItemView::SingleSelection);
         targetFilenameEditor->setSelectionBehavior(QAbstractItemView::SelectItems);
+        targetFilenameEditor->setColumnCount(1);
+        targetFilenameEditor->horizontalHeader()->setVisible(false);
+        targetFilenameEditor->horizontalHeader()->setStretchLastSection(true);
 
         verticalLayout->addWidget(targetFilenameEditor);
 

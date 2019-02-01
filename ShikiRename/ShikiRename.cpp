@@ -12,7 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QThread>
-#include <qtconcurrentrun.h>
+#include <QtConcurrentRun>
 #include <QtNetwork/QNetworkReply>
 #include <QTimer>
 #include <QList>
@@ -20,6 +20,7 @@
 #include <QWindowStateChangeEvent>
 #include <QtWin>
 #include <QScrollBar>
+#include <QPropertyAnimation>
 
 ShikiRename::ShikiRename(QWidget *parent) :
 	QMainWindow(parent),
@@ -34,8 +35,8 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	ui->horizontalLayout_10->setAlignment(Qt::AlignLeft);
 	ui->verticalLayout->setAlignment(Qt::AlignLeft);
 	//Filename lists
-	ui->currentList->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	ui->renamePreview->setSelectionMode(QAbstractItemView::NoSelection);
+	ui->itemTable->setSelectionMode(QAbstractItemView::ExtendedSelection);
+	ui->itemTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	//initial states
 	ui->actionUndo->setEnabled(false);
 	ui->actionRedo->setEnabled(false);
@@ -133,8 +134,10 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	connect(ui->buttonOpen, SIGNAL(clicked()), this, SLOT(on_actionOpen_triggered()));
 	connect(seriesSelectionDialog, SIGNAL(closed(int, QString)), this, SLOT(on_seriesSelectedDialog_closed(int, QString)));
 
-	ui->renamePreview->setVerticalScrollBar(ui->currentList->verticalScrollBar());	//oddly moves currentList's scrollbar to renamePreview
-	ui->currentList->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);	//no longer has a scrollbar, so this essentially just removes the scrollbar area
+	/*
+	ui->itemTable->setVerticalScrollBar(ui->itemTable->verticalScrollBar());	//oddly moves currentList's scrollbar to renamePreview
+	ui->itemTable->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);	//no longer has a scrollbar, so this essentially just removes the scrollbar area
+	*/
 	//tvdb communication
 	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(setData(QJsonArray)));
 	connect(&tvdb, SIGNAL(receivedSeriesData(QJsonArray)), seriesSelectionDialog, SLOT(show()));
@@ -145,7 +148,7 @@ ShikiRename::ShikiRename(QWidget *parent) :
 	//ui changes from worker threads have to be done by signals&slots
 	connect(this, SIGNAL(workingStarts()), this, SLOT(beforePreview()));
 	connect(this, SIGNAL(workingEnds()), this, SLOT(afterPreview()));
-	connect(this, SIGNAL(preview(QListWidgetItem*)), this, SLOT(addToPreview(QListWidgetItem*)));
+	connect(this, SIGNAL(preview(QTableWidgetItem*)), this, SLOT(addToPreview(QTableWidgetItem*)));
 	//Multithreading
 	connect(&dirWatcherFW, SIGNAL(finished()), this, SLOT(on_dirWatcherFW_finished()));
 	connect(&previewFW, SIGNAL(finished()), this, SLOT(on_renamePreview_finished()));
@@ -390,20 +393,36 @@ void ShikiRename::on_checkboxOnlySelected_toggled(const bool &checked)
 	input.onlySelected = checked;
 	this->previewRename();
 }
-void ShikiRename::on_currentList_itemSelectionChanged()
+void ShikiRename::on_itemTable_itemSelectionChanged()
 {
-	QList<QListWidgetItem *> selectedItems = ui->currentList->selectedItems();
+	QList<QTableWidgetItem *> selectedItems = ui->itemTable->selectedItems();
 	selectedFilenames.clear();
 	for (auto item : selectedItems) {
 		selectedFilenames.append(item->text());
 	}
 	if (input.onlySelected) {
-		searchEpisode_startIdx = -1;
+		searchEpisode_cutoff = -1;
 		this->previewRename();
 	}
 }
 bool ShikiRename::isSelectedInList(QString filename) {
 	return (!input.onlySelected || input.onlySelected && selectedFilenames.contains(filename));
+}
+
+void ShikiRename::addToPreview(QTableWidgetItem* item) {
+	if (item->data(ItemDataRole::ID).isNull()) {
+		qDebug() << "ERROR: No ID set for Preview item:" << item->text();;
+	}
+	item->setFlags(Qt::NoItemFlags);
+	item->setIcon(QIcon());
+	ui->itemTable->setItem(item->data(ItemDataRole::ID).toInt(), ItemRole::Preview, item);
+}
+
+void ShikiRename::addToCurrent(QTableWidgetItem* item) {
+	if (item->data(ItemDataRole::ID).isNull()) {
+		qDebug() << "ERROR: No ID set for Current item:" << item->text();;
+	}
+	ui->itemTable->setItem(item->data(ItemDataRole::ID).toInt(), ItemRole::Current, item);
 }
 
 void ShikiRename::open(QDir dir) {
@@ -416,15 +435,17 @@ void ShikiRename::open(QDir dir) {
 
 	dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
 	infoList = dir.entryInfoList();
-	ui->renamePreview->clear();
-	ui->currentList->clear();
-	searchEpisode_startIdx = -1;
+	ui->itemTable->setRowCount(0);
+	ui->itemTable->setRowCount(infoList.length());
+	searchEpisode_cutoff = -1;
 
 	for (int i = 0; i < infoList.count(); i++) {
 		QFileInfo fi = infoList.at(i);
-		QListWidgetItem* item = new QListWidgetItem(fi.fileName(), ui->currentList);
-		//item->setData(FileInfoItemRole::AbsolutePath, fi.absoluteFilePath());
-		addToPreview(item);
+		QTableWidgetItem* item = new QTableWidgetItem(fi.fileName());
+		item->setData(ItemDataRole::ID, i);
+		QTableWidgetItem* item2 = item->clone();
+		addToCurrent(item);
+		addToPreview(item2);
 	}
 
 	watchFileChanges();
@@ -544,147 +565,220 @@ void ShikiRename::on_renamePreview_finished() {
 	return;
 }
 void ShikiRename::previewRename() {
-	QFuture<void> future = QtConcurrent::run(this, &ShikiRename::buildPreview);
-}
-
-void ShikiRename::beforePreview() {
-	ui->renamePreview->clear();
-	//ui->tabWidget->setEnabled(false);
-}
-
-void ShikiRename::afterPreview() {
-	ui->buttonRename->setEnabled(ui->renamePreview->count() > 0);
-	//ui->tabWidget->setEnabled(true);
-}
-
-void ShikiRename::addToPreview(QListWidgetItem* qListWidgetItem) {
-	ui->renamePreview->addItem(qListWidgetItem);
-}
-
-void ShikiRename::buildPreview() {
 	emit workingStarts();
-	QMutableListIterator<QFileInfo> it(infoList);
+	QListIterator<QFileInfo> it(infoList);
 	QJsonArray episodeData = tvdb.getEpisodeData();
 	int cur_num = input.num_init;							//keeps track of our current number for the consecutive numeration operation
-
-	while (it.hasNext())									//iterates through every file
-	{
-		bool selected = false;
-		QString v = it.next().completeBaseName();			//v = original filename without file extension
-		if (isSelectedInList(it.value().fileName())) {		//if enabled, checks if the file has been selected.
-			QString filePath = it.value().absoluteFilePath();
-
-			selected = true;
-			if (ui->tabWidget->currentIndex() == 0) {
-				//Remove left
-				if (input.remLeft > 0)
-					v = v.remove(0, input.remLeft);
-
-				//Remove right
-				if (input.remRight > 0)
-					v = v.remove(v.length() - input.remRight, input.remRight);
-
-				//Replace x with y
-				if (!input.replace1.isNull() && !input.replace1.isEmpty()) {
-					if (input.replace2.isNull())
-						input.replace2 = "";
-
-					for (int idx = v.length(); (idx = v.lastIndexOf(input.replace1, idx - 1)) != -1;)
-					{
-						v = v.replace(idx, input.replace1.length(), input.replace2);
-						if (idx == 0) break;
-					}
-				}
-
-				//Insert at idx a string
-				if (input.insert_idx >= 0 && !input.insert_string.isEmpty() && !input.insert_string.isNull() && input.insert_idx <= v.length())
-					v.insert(input.insert_idx, input.insert_string);
-
-				//Remove x characters after index y
-				if (input.removeAt_amount > 0 && input.removeAt_idx >= 0 && input.removeAt_idx <= v.length())
-					v = v.left(input.removeAt_idx) + v.right(v.length() - input.removeAt_idx - input.removeAt_amount);
-
-				//Prefix
-				if (!input.prefix.isNull())
-					v = v.prepend(input.prefix);
-
-				//Suffix
-				if (!input.suffix.isNull())
-					v = v.append(input.suffix);
-
-				//Consecutive numeration
-				if (input.num_idx >= 0 && input.num_init >= 0 && input.num_inc >= 0 && input.num_digits > 0) {
-					QString num_s = this->zerofy(QString::number(cur_num), input.num_digits);
-					v = v.insert(input.num_idx, num_s);
-					cur_num = cur_num + input.num_inc;
-				}
-
-			}
-			else if (ui->tabWidget->currentIndex() == 1) {
-				ShikiRename::cacheMediaInfo(it.value());
-				QRegExp rgx_invalidFnCharset_win = QRegExp(QString("[") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
-				std::pair<int, int> s_e = this->searchSeasonAndEpisode(v);
-				int season;
-				int ep;
-				if (!input.vid_noSeason) {
-					season = s_e.first;
-					ep = s_e.second;
-				}
-				else {
-					season = 1;
-					ep = this->searchEpisode(v);
-				}
-				QString episodeName;
-				QString episodeAbsolute;
-				QString episodeYear;
-				if (!episodeData.empty() && !episodeData.first().toObject().value("episodeName").isUndefined()) {
-					for (auto item : episodeData) {
-						QJsonObject jo = item.toObject();
-						if (jo.value("airedSeason").toInt() == season && jo.value("airedEpisodeNumber").toInt() == ep) {
-							episodeName = jo.value("episodeName").toString();
-							episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
-							episodeYear = jo.value("firstAired").toString().left(4);
-							break;
-						}
-					}
-				}
-
-				v = input.vid_customFileNameRaw;
-				v.replace(QString("<NAME>"), input.vid_name)
-					.replace(QString("<SEASON PREFIX>"), input.vid_sPrefix)
-					.replace(QString("<SEASON>"), this->zerofy(QString::number(season), input.vid_sDigits))
-					.replace(QString("<EPISODE PREFIX>"), input.vid_ePrefix)
-					.replace(QString("<EPISODE>"), this->zerofy(QString::number(ep), input.vid_eDigits))
-					.replace(QString("<EPISODE ABSOLUTE>"), this->zerofy(episodeAbsolute, input.vid_eDigits))
-					.replace(QString("<EPISODE NAME>"), episodeName)
-					.replace(QString("<YEAR>"), episodeYear)
-					.replace(QString("<LANGUAGE>"), mediaInfoCache[filePath]["language"])
-					.replace(QString("<AUDIO>"), mediaInfoCache[filePath]["aCodec"])
-					.replace(QString("<RESOLUTION>"), mediaInfoCache[filePath]["resolution"])
-					.replace(QString("<SOURCE>"), "")
-					.replace(QString("<VIDEO>"), mediaInfoCache[filePath]["vCodec"])
-					.replace(QString("<SCENE GROUP>"), "");
-				v.remove(rgx_invalidFnCharset_win);
-			}
+	QIcon busy = QIcon(":/ShikiRename/shell32icons/238.png");
+	
+	for (auto item : ui->itemTable->findItems("*", Qt::MatchWildcard)) {
+		if (item->column() == ItemRole::Preview)
+			item->setIcon(busy);
+	}
+	for (auto fi : infoList) {
+		QTableWidgetItem* item = ui->itemTable->findItems(fi.fileName(), Qt::MatchExactly).at(0);
+		QFuture<void> future = QtConcurrent::run(this, &ShikiRename::buildPreview, fi, cur_num, episodeData, item);
+		if (isSelectedInList(fi.fileName())) {
+			cur_num = cur_num + input.num_inc;
 		}
-		QString fullFilename = v % QChar('.') % it.value().suffix();
-		QListWidgetItem* qListWidgetItem = new QListWidgetItem(fullFilename);
-		qListWidgetItem->setFlags(Qt::ItemNeverHasChildren);
-		if (selected) {
-			qListWidgetItem->setTextColor(Qt::black);
-		}
-		//ui->renamePreview->addItem(qListWidgetItem);
-		emit preview(qListWidgetItem);
 	}
 	emit workingEnds();
 }
 
-void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
+void ShikiRename::beforePreview() {
+	//ui->itemTable->clear();
+	//ui->tabWidget->setEnabled(false);
+}
+
+void ShikiRename::afterPreview() {
+	ui->buttonRename->setEnabled(ui->itemTable->rowCount() > 0);
+	//ui->tabWidget->setEnabled(true);
+}
+
+void ShikiRename::buildPreview(QFileInfo& fi, int& num, QJsonArray& episodeData, QTableWidgetItem* item) {
+	bool selected = false;
+	QString v = fi.completeBaseName();			//v = original filename without file extension
+	if (isSelectedInList(fi.fileName())) {		//if enabled, checks if the file has been selected.
+		QString filePath = fi.absoluteFilePath();
+
+		selected = true;
+		if (ui->tabWidget->currentIndex() == 0) {
+			//Remove left
+			if (input.remLeft > 0)
+				v = v.remove(0, input.remLeft);
+
+			//Remove right
+			if (input.remRight > 0)
+				v = v.remove(v.length() - input.remRight, input.remRight);
+
+			//Replace x with y
+			if (!input.replace1.isNull() && !input.replace1.isEmpty()) {
+				if (input.replace2.isNull())
+					input.replace2 = "";
+
+				for (int idx = v.length(); (idx = v.lastIndexOf(input.replace1, idx - 1)) != -1;)
+				{
+					v = v.replace(idx, input.replace1.length(), input.replace2);
+					if (idx == 0) break;
+				}
+			}
+
+			//Insert at idx a string
+			if (input.insert_idx >= 0 && !input.insert_string.isEmpty() && !input.insert_string.isNull() && input.insert_idx <= v.length())
+				v.insert(input.insert_idx, input.insert_string);
+
+			//Remove x characters after index y
+			if (input.removeAt_amount > 0 && input.removeAt_idx >= 0 && input.removeAt_idx <= v.length())
+				v = v.left(input.removeAt_idx) + v.right(v.length() - input.removeAt_idx - input.removeAt_amount);
+
+			//Prefix
+			if (!input.prefix.isNull())
+				v = v.prepend(input.prefix);
+
+			//Suffix
+			if (!input.suffix.isNull())
+				v = v.append(input.suffix);
+
+			//Consecutive numeration
+			if (input.num_idx >= 0 && input.num_init >= 0 && input.num_inc >= 0 && input.num_digits > 0) {
+				QString num_s = zerofy(QString::number(num), input.num_digits);
+				v = v.insert(input.num_idx, num_s);
+			}
+
+		}
+		else if (ui->tabWidget->currentIndex() == 1) {
+			QRegExp rgx_invalidFnCharset_win = QRegExp(QString("[") % QRegExp::escape(invalidFnCharset_win) % QString("]+"));
+			std::pair<int, int> s_e = searchSeasonAndEpisode(v);
+			int season;
+			int ep;
+			if (!input.vid_noSeason) {
+				season = s_e.first;
+				ep = s_e.second;
+			}
+			else {
+				season = 1;
+				if (searchEpisode_cutoff < 0) {
+					findEpisodeNumberIdx();
+				}
+				ep = searchEpisode(v, searchEpisode_cutoff);
+			}
+			QString episodeName;
+			QString episodeAbsolute;
+			QString episodeYear;
+			if (!episodeData.empty() && !episodeData.first().toObject().value("episodeName").isUndefined()) {
+				for (auto item : episodeData) {
+					QJsonObject jo = item.toObject();
+					if (jo.value("airedSeason").toInt() == season && jo.value("airedEpisodeNumber").toInt() == ep) {
+						episodeName = jo.value("episodeName").toString();
+						episodeAbsolute = QString::number(jo.value("absoluteNumber").toInt());
+						episodeYear = jo.value("firstAired").toString().left(4);
+						break;
+					}
+				}
+			}
+			ShikiRename::cacheMediaInfo(fi);
+			v = input.vid_customFileNameRaw;
+			v.replace(QString("<NAME>"), input.vid_name)
+				.replace(QString("<SEASON PREFIX>"), input.vid_sPrefix)
+				.replace(QString("<SEASON>"), zerofy(QString::number(season), input.vid_sDigits))
+				.replace(QString("<EPISODE PREFIX>"), input.vid_ePrefix)
+				.replace(QString("<EPISODE>"), zerofy(QString::number(ep), input.vid_eDigits))
+				.replace(QString("<EPISODE ABSOLUTE>"), zerofy(episodeAbsolute, input.vid_eDigits))
+				.replace(QString("<EPISODE NAME>"), episodeName)
+				.replace(QString("<YEAR>"), episodeYear)
+				.replace(QString("<LANGUAGE>"), mediaInfoCache[filePath]["language"])
+				.replace(QString("<AUDIO>"), mediaInfoCache[filePath]["aCodec"])
+				.replace(QString("<RESOLUTION>"), mediaInfoCache[filePath]["resolution"])
+				.replace(QString("<SOURCE>"), "")
+				.replace(QString("<VIDEO>"), mediaInfoCache[filePath]["vCodec"])
+				.replace(QString("<SCENE GROUP>"), "");
+			v.remove(rgx_invalidFnCharset_win);
+		}
+	}
+	QString fullFilename = v % QChar('.') % fi.suffix();
+	QTableWidgetItem* newItem = item->clone();
+	newItem->setText(fullFilename);
+	newItem->setFlags(Qt::ItemNeverHasChildren);
+	if (selected) {
+		newItem->setTextColor(Qt::black);
+	}
+	emit preview(newItem);
+}
+
+/**
+ * Tries to find season and episode number inside a given string using a currently hardcoded pattern.
+ *
+ * @param filename_qs Text containing a type of naming pattern representing a season and an episode number
+ * @return Two numbers we assume to be season and episode numbers or (0,0) if detection failed. (Season, Episode)
+ */
+std::pair<int, int> searchSeasonAndEpisode(QString filename_qs) {
+	std::string filename = filename_qs.toStdString();
+	std::regex rgx(R"([sS][^\d]*0*(\d+)[\s]*[^A-Za-z0-9]*[eE][^\d]*0*(\d+))");
+	std::smatch match;
+	std::pair<int, int> result;
+	if (std::regex_search(filename, match, rgx)) {
+		int s = std::stoi(match.str(1));
+		int e = std::stoi(match.str(2));
+		result = std::make_pair(s, e);
+	}
+	return result;
+}
+void ShikiRename::findEpisodeNumberIdx() {
+	if (searchEpisode_cutoff < 0) {
+		searchEpisode_cutoff = -1;
+		QVector<QString> fileNames;
+
+		for (auto item : infoList) {
+			if (item.fileName().isEmpty()) {	//shouldn't happen
+				fileNames.clear();
+				break;
+			}
+			fileNames.append(item.fileName());
+		}
+		if (!fileNames.isEmpty()) {
+			for (int i = 0; i < fileNames.count() - 1; i++) {
+				QString s1 = fileNames.at(i);
+				if (isSelectedInList(s1)) {											//current idx s1 must be in selection
+					QString s2 = fileNames.at(i + 1);
+					int j = i + 2;
+					while (!isSelectedInList(s2) && j < fileNames.count()) {	//increase second index s2 till we get a selected item but don't exceed the list length
+						j++;
+					}
+					i = j - 1;													//next s1 shall be current s2, so move our s1 idx in front of our s2 idx so the next loop increments it to current s2 idx
+					s2 = fileNames.at(j);
+					if (!isSelectedInList(s2)) {									//not in selection so it must be the last item in the list according to our previous while loop
+						break;
+					}
+					//compare strings until a difference is found or until we've reached a previously determined index of a difference
+					for (int k = 0; k < s1.length() && (searchEpisode_cutoff == -1 || k < searchEpisode_cutoff); k++) {
+						if (s1.at(k) != s2.at(k)) {
+							searchEpisode_cutoff = k;
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+int searchEpisode(QString filename, int cutoff) {
+	std::string string = filename.mid(cutoff).toStdString();
+	std::regex rgx(R"([\D0]*(\d+)[\s\S]*)");
+	std::smatch match;
+	int result = -1;
+	if (std::regex_search(string, match, rgx)) {
+		result = std::stoi(match.str(1));
+	}
+	return result;
+}
+
+void ShikiRename::cacheMediaInfo(const QFileInfo& fileInfo) {
 	QString filePath = fileInfo.absoluteFilePath();
 
 	if (mediaInfoCache.contains(filePath))
 		return;	//it's already cached
 
+	MediaInfoDLL::MediaInfo MI;
 	MI.Open(filePath.toStdWString());
 	QMap<QString, QString> mediaInfo;
 	QString fileType = fileInfo.suffix();
@@ -739,6 +833,14 @@ void ShikiRename::cacheMediaInfo(QFileInfo fileInfo) {
 
 	//qDebug() << "Adding" << fileInfo.absoluteFilePath() << "to mediaInfoCache";
 	mediaInfoCache[fileInfo.absoluteFilePath()] = mediaInfo;
+
+	//MI.Close();
+}
+
+bool sortItemsByText(QTableWidgetItem* p1, QTableWidgetItem* p2) {
+	if (p1 && p2)
+		return p1->text() < p2->text();
+	return false;
 }
 
 void ShikiRename::on_buttonRename_clicked()
@@ -761,32 +863,36 @@ void ShikiRename::on_buttonRename_clicked()
 	qDebug() << "Disabling dirWatcher";
 	dirWatcher.cancel();
 
-	QStringList targetNames;
-	for (int i = 0; i < ui->renamePreview->count(); i++) {
-		targetNames.append(ui->renamePreview->item(i)->text());
+	QList<QTableWidgetItem*> targetItems;
+	for (int i = 0; i < ui->itemTable->rowCount(); i++) {
+		targetItems.append(ui->itemTable->item(i, ItemRole::Preview));
 	}
-	renameConfirmationDialog->setTargetNameList(targetNames);
+	renameConfirmationDialog->setTargetNameList(targetItems);
 	if (renameConfirmationDialog->exec()) {
-		targetNames = renameConfirmationDialog->getTargetNameList();
+		targetItems = renameConfirmationDialog->getTargetNameList();
 	}
 	else {
 		return;
 	}
 
-	ui->renamePreview->clear();
-	ui->renamePreview->addItems(targetNames);
-	QStringList targetNames_sorted = targetNames;
-	targetNames_sorted.sort();
+	for (auto item : targetItems) {
+		addToPreview(item);
+	}
+	QList <QTableWidgetItem*> sortedItems = targetItems;
+	qSort(sortedItems.begin(), sortedItems.end(), sortItemsByText);
 
 	bool dupe_found = false;
 	QList<QColor> appropiateTextColors = { Qt::red, Qt::blue, Qt::green, Qt::cyan, Qt::magenta, Qt::darkYellow };
 	int appropiateTextColorIterator = 0;
-	for (int i = 0; i < targetNames_sorted.count() - 1; i++) {
-		if (targetNames_sorted.at(i).compare(targetNames_sorted.at(i + 1), Qt::CaseInsensitive) == 0) {	//check if there are duplicate filenames
+	for (int i = 0; i < sortedItems.count() - 1; i++) {
+		if (sortedItems.at(i)->text().compare(sortedItems.at(i + 1)->text(), Qt::CaseInsensitive) == 0) {	//check if there are duplicate filenames
 			dupe_found = true;																			//there are dupes, so we won't rename
-			QList<QListWidgetItem *> li = ui->renamePreview->findItems(targetNames_sorted.at(i), Qt::MatchFixedString);	//get all dupe items in preview
-			for (auto item : li)
-				item->setTextColor(appropiateTextColors.at(appropiateTextColorIterator%appropiateTextColors.length()));	//mark dupes in preview
+			QList<QTableWidgetItem *> li = ui->itemTable->findItems(sortedItems.at(i)->text(), Qt::MatchFixedString);	//get all dupe items in preview
+			for (auto item : li) {
+				if (item->column() == ItemRole::Preview) {
+					item->setTextColor(appropiateTextColors.at(appropiateTextColorIterator%appropiateTextColors.length()));	//mark dupes in preview
+				}
+			}
 			appropiateTextColorIterator++;
 		}
 	}
@@ -797,10 +903,10 @@ void ShikiRename::on_buttonRename_clicked()
 		return;
 	}
 
-	for (int i = 0; i < ui->renamePreview->count(); i++) {
-		if (isSelectedInList(ui->currentList->item(i)->text())) {
+	for (int i = 0; i < ui->itemTable->rowCount(); i++) {
+		if (isSelectedInList(ui->itemTable->item(i, ItemRole::Preview)->text())) {
 			QString oldName = infoList.at(i).absoluteFilePath();	//original file
-			QString newName = infoList.at(i).absolutePath() % QChar('/') % ui->renamePreview->item(i)->text();	//new file
+			QString newName = infoList.at(i).absolutePath() % QChar('/') % ui->itemTable->item(i, ItemRole::Preview)->text();	//new file
 
 			if (oldName != newName) {
 				if (newName.length() > MAX_PATH) {
@@ -825,73 +931,8 @@ void ShikiRename::on_buttonRename_clicked()
 	this->open(dir);	//reload everything so it shows the new current state of the files
 }
 
-QString ShikiRename::zerofy(QString string, int digits) {
+QString zerofy(QString string, int digits) {
 	return QString(digits - string.length(), '0') + string;
-}
-
-/**
- * Tries to find season and episode number inside a given string using a currently hardcoded pattern.
- *
- * @param filename_qs Text containing a type of naming pattern representing a season and an episode number
- * @return Two numbers we assume to be season and episode numbers or (0,0) if detection failed. (Season, Episode)
- */
-std::pair<int, int> ShikiRename::searchSeasonAndEpisode(QString filename_qs) {
-	std::string filename = filename_qs.toStdString();
-	std::regex rgx(R"([sS][^\d]*0*(\d+)[\s]*[^A-Za-z0-9]*[eE][^\d]*0*(\d+))");
-	std::smatch match;
-	std::pair<int, int> result;
-	if (std::regex_search(filename, match, rgx)) {
-		int s = std::stoi(match.str(1));
-		int e = std::stoi(match.str(2));
-		result = std::make_pair(s, e);
-	}
-	return result;
-}
-int ShikiRename::searchEpisode(QString filename) {
-	if (searchEpisode_startIdx < 0) {
-		searchEpisode_startIdx = -1;
-		QVector<QString> fileNames;
-
-		for (auto item : infoList) {
-			if (item.fileName().isEmpty()) {	//shouldn't happen
-				fileNames.clear();
-				break;
-			}
-			fileNames.append(item.fileName());
-		}
-		if (!fileNames.isEmpty()) {
-			for (int i = 0; i < fileNames.count() - 1; i++) {
-				QString s1 = fileNames.at(i);
-				if (isSelectedInList(s1)) {											//current idx must be in selection
-					QString s2 = fileNames.at(i + 1);
-					int j = i + 2;
-					for (; !isSelectedInList(s2) && j < fileNames.count(); j++) {	//next idx must be in selection as well
-						i = j - 1;													//next s1 shall be current s2, so move our s1 idx in front of our s2 idx so the next loop increments to s2 idx
-						s2 = fileNames.at(j);
-					}
-					if (!isSelectedInList(s2)) {									//last item reached & is not in selection
-						break;
-					}
-					//compare strings until a difference is found or until we've reached a previously determined index of a difference
-					for (int k = 0; k < s1.length() && (searchEpisode_startIdx == -1 || k < searchEpisode_startIdx); k++) {
-						if (s1.at(k) != s2.at(k)) {
-							searchEpisode_startIdx = k;
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	std::string string = filename.mid(searchEpisode_startIdx).toStdString();
-	std::regex rgx(R"([\D0]*(\d+)[\s\S]*)");
-	std::smatch match;
-	int result = -1;
-	if (std::regex_search(string, match, rgx)) {
-		result = std::stoi(match.str(1));
-	}
-	return result;
 }
 
 void ShikiRename::openDialogSeriesSelection(QJsonArray seriesData) {

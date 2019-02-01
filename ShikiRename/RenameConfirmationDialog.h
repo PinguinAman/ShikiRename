@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QString>
+#include <QTableWidgetItem>
 
 namespace Ui {
 	class RenameConfirmationDialog;
@@ -16,8 +17,8 @@ public:
 	explicit RenameConfirmationDialog(QWidget *parent);
 	~RenameConfirmationDialog();
 
-	void setTargetNameList(QStringList names);
-	QStringList getTargetNameList();
+	void setTargetNameList(QList<QTableWidgetItem*> names);
+	QList<QTableWidgetItem*> getTargetNameList();
 
 	signals:
 

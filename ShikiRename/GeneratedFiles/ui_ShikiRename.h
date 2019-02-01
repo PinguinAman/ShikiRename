@@ -18,15 +18,16 @@
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -48,8 +49,7 @@ public:
     QPushButton *buttonOpen;
     QLineEdit *editDirectory;
     QHBoxLayout *hLayout_Lists;
-    QListWidget *currentList;
-    QListWidget *renamePreview;
+    QTableWidget *itemTable;
     QCheckBox *checkboxOnlySelected;
     QTabWidget *tabWidget;
     QWidget *tab_1;
@@ -189,16 +189,19 @@ public:
         hLayout_Lists = new QHBoxLayout();
         hLayout_Lists->setSpacing(0);
         hLayout_Lists->setObjectName(QString::fromUtf8("hLayout_Lists"));
-        currentList = new QListWidget(centralWidget);
-        currentList->setObjectName(QString::fromUtf8("currentList"));
-        currentList->setMaximumSize(QSize(16777215, 16777215));
+        itemTable = new QTableWidget(centralWidget);
+        if (itemTable->columnCount() < 2)
+            itemTable->setColumnCount(2);
+        itemTable->setObjectName(QString::fromUtf8("itemTable"));
+        itemTable->setMaximumSize(QSize(16777215, 16777215));
+        itemTable->setColumnCount(2);
+        itemTable->horizontalHeader()->setVisible(true);
+        itemTable->horizontalHeader()->setCascadingSectionResizes(false);
+        itemTable->horizontalHeader()->setHighlightSections(true);
+        itemTable->horizontalHeader()->setStretchLastSection(false);
+        itemTable->verticalHeader()->setVisible(false);
 
-        hLayout_Lists->addWidget(currentList);
-
-        renamePreview = new QListWidget(centralWidget);
-        renamePreview->setObjectName(QString::fromUtf8("renamePreview"));
-
-        hLayout_Lists->addWidget(renamePreview);
+        hLayout_Lists->addWidget(itemTable);
 
 
         vLayout_Main->addLayout(hLayout_Lists);
@@ -648,8 +651,7 @@ public:
         statusBar = new QStatusBar(ShikiRenameClass);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
         ShikiRenameClass->setStatusBar(statusBar);
-        QWidget::setTabOrder(currentList, renamePreview);
-        QWidget::setTabOrder(renamePreview, checkboxOnlySelected);
+        QWidget::setTabOrder(itemTable, checkboxOnlySelected);
         QWidget::setTabOrder(checkboxOnlySelected, tabWidget);
         QWidget::setTabOrder(tabWidget, editRemoveLeft);
         QWidget::setTabOrder(editRemoveLeft, editRemoveRight);

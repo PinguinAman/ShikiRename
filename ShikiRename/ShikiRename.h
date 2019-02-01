@@ -27,8 +27,15 @@ class ShikiRename : public QMainWindow
 {
 	Q_OBJECT
 
-		enum FileInfoItemRole {
-		AbsolutePath = Qt::UserRole
+protected:
+		enum ItemDataRole {
+		ID = Qt::UserRole,
+		AbsolutePath = Qt::UserRole+1
+	};
+
+	enum ItemRole {
+		Current = 0,
+		Preview = 1
 	};
 
 public:
@@ -69,12 +76,13 @@ public:
 signals:
 	void workingStarts();
 	void workingEnds();
-	void preview(QListWidgetItem*);
+	void preview(QTableWidgetItem*);
 
 private slots:
 	void beforePreview();
 	void afterPreview();
-	void addToPreview(QListWidgetItem*);
+	void addToCurrent(QTableWidgetItem*);
+	void addToPreview(QTableWidgetItem*);
 
 	void on_tabWidget_currentChanged(const int &index);
 	void on_editDirectory_returnPressed();
@@ -108,7 +116,7 @@ private slots:
 	void on_comboEpisodeNameLang_currentIndexChanged(const int &index);
 	void comboEpisodeNameLang_addItems(QStringList items);
 	void on_checkboxOnlySelected_toggled(const bool &checked);
-	void on_currentList_itemSelectionChanged();
+	void on_itemTable_itemSelectionChanged();
 	void on_renamePreview_finished();
 
 	void on_actionOpen_triggered();
@@ -140,6 +148,7 @@ private:
 	QString invalidFnCharset_win;
 	QStringList fileTypes_video;
 
+	QMutex mutexMI;
 	MediaInfoDLL::MediaInfo MI;
 	QMap<QString, QMap<QString, QString>> mediaInfoCache;
 
@@ -151,14 +160,12 @@ private:
 
 	void open(QDir dir);
 	void addToHistory(int id, QString o, QString n);
-	void buildPreview();
-	void cacheMediaInfo(QFileInfo fileInfo);
+	void buildPreview(QFileInfo& fi, int& num, QJsonArray& episodeData, QTableWidgetItem* item);
+	void cacheMediaInfo(const QFileInfo& fileInfo);
 
-	QString zerofy(QString string, int digits);
-
-	std::pair<int, int> searchSeasonAndEpisode(QString filename_qs);
-	int searchEpisode(QString filename_qs);
-	int searchEpisode_startIdx;
+	void findEpisodeNumberIdx();
+	//void videoFilenameBuilder
+	int searchEpisode_cutoff;
 
 	bool onlineDbAvailable();
 
@@ -177,5 +184,8 @@ private:
 	QFutureWatcher<void> previewFW;
 	QFutureWatcher<int> dirWatcherFW;
 };
+std::pair<int, int> searchSeasonAndEpisode(QString filename_qs);
+int searchEpisode(QString filename, int cutoff);
+QString zerofy(QString string, int digits);
 
 #endif // SHIKIRENAME_H
